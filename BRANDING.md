@@ -104,19 +104,19 @@ module maker described below. Use `antumbra-browser`.
 None of these are in privacy, security, VPN or browser software, but all three
 are real and should go in front of the attorney.
 
-1. **Antumbra (Eurorack modular synthesizers)** — a small open-source hardware
+1. **Antumbra (Eurorack modular synthesizers)**. A small open-source hardware
    brand making modules such as ATOM, CARA, KLIK, KNIT, DVCA and SMOG, listed on
    [ModularGrid](https://modulargrid.net/e/vendors/view/604). Probably the owner
    of `github.com/antumbra` and `github.com/antumbramodular`. Different goods,
    but socially adjacent: this brand lives in the same open-source-hardware and
    maker communities your users do.
-2. **Antumbra (computer bias lighting startup)** — shipped a cross-platform
+2. **Antumbra (computer bias lighting startup)**. Shipped a cross-platform
    desktop app called *Glow* for Apple, Windows and Linux. [Covered by Network
    World](https://www.networkworld.com/article/931212/computer-lighting-startup-antumbra-delivers-surround-sound-for-your-eyes.html).
    This is the one that matters most: it is an actual **software** use of the
    exact word, which touches Class 9. It appears small and inactive, but confirm
    its trademark status during clearance.
-3. **Philips Dynalite Antumbra** — lighting control wall panels, an
+3. **Philips Dynalite Antumbra**. Lighting control wall panels, an
    [ADEX award winner](https://adexawards.com/products/detail/2042-home-lighting-automation-switches/321928-philips-antumbra).
    Signify is a large company. Unrelated goods and a completely different buyer,
    so a Class 9 or 42 filing for a browser should not collide, but a large
@@ -132,7 +132,7 @@ where Umbra was not.
 
 ## 4. Feature names
 
-### 4.1 Blackout mode — KEEP
+### 4.1 Blackout mode: KEEP
 
 The maximum adblocking and tracking protection tier.
 
@@ -149,7 +149,7 @@ disqualifying.
 
 **Do not** attempt to register it as a standalone mark.
 
-### 4.2 Totality window — the built-in Tor window
+### 4.2 Totality window: the built-in Tor window
 
 Labeled in UI and docs as **"Totality window, powered by Tor."**
 

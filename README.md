@@ -40,7 +40,13 @@ It was renamed and moved here from an earlier personal account. Link to the
 canonical URL above rather than the old path: GitHub's redirect is a courtesy
 that stops working if anyone recreates a repository under the old name.
 
-## Branding
+## Documentation
 
-See [BRANDING.md](BRANDING.md) for the full name research, trademark findings,
-icon specification, color tokens, and the pre-launch checklist.
+| Document | What is in it |
+|---|---|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | How Antumbra is built: fork strategy, every feature costed by implementation layer, repo structure, build and CI, licensing. |
+| [ROADMAP.md](ROADMAP.md) | Milestones, starting with the smallest shippable desktop build. |
+| [BRANDING.md](BRANDING.md) | Name research, trademark findings, icon specification, color tokens, pre-launch checklist. |
+
+Antumbra is a minimal-patch fork of Firefox (Gecko), licensed MPL 2.0. Nothing
+has been built yet: both ARCHITECTURE.md and ROADMAP.md are plans for review.

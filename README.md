@@ -31,6 +31,15 @@ Antumbra is an independent project. It is not affiliated with, endorsed by, or
 sponsored by Mozilla or the Tor Project. "Firefox" is a trademark of the Mozilla
 Foundation; "Tor" is a trademark of The Tor Project, Inc.
 
+## Repository
+
+The canonical home of this project is
+[github.com/antumbra-browser/antumbra-browser](https://github.com/antumbra-browser/antumbra-browser).
+
+It was renamed and moved here from an earlier personal account. Link to the
+canonical URL above rather than the old path: GitHub's redirect is a courtesy
+that stops working if anyone recreates a repository under the old name.
+
 ## Branding
 
 See [BRANDING.md](BRANDING.md) for the full name research, trademark findings,

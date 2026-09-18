@@ -90,14 +90,25 @@ a purchase inquiry on `antumbra.com` since it is openly for sale, and treat
 
 | Handle | Status |
 |---|---|
-| `antumbra-browser` | **Available** |
-| `antumbrabrowser` | **Available** |
-| `getantumbra` | **Available** |
+| `antumbra-browser` | **Claimed, canonical home of the project.** |
+| `antumbrabrowser` | **Available.** Claim defensively to prevent impersonation. |
+| `getantumbra` | **Available.** Claim defensively to prevent impersonation. |
 | `antumbra` | **Taken** (account id 2953042) |
 
 Correcting the earlier round of research, which reported no GitHub conflict for
 Antumbra: the bare `antumbra` handle **is** taken, most likely by the Eurorack
-module maker described below. Use `antumbra-browser`.
+module maker described below. `antumbra-browser` is the handle in use.
+
+**Canonical repository:**
+[github.com/antumbra-browser/antumbra-browser](https://github.com/antumbra-browser/antumbra-browser)
+
+This repository was renamed from `Umbra-Browser` and transferred out of the
+original personal account into the `antumbra-browser` org. Use the canonical URL
+above everywhere. GitHub serves a redirect from the old path, but do not rely on
+it: redirects break as soon as anyone recreates a repository at the old name, and
+they do not cover every consumer (package managers, CI configuration and badge
+services in particular). The old path survives here only as a historical note in
+this document, never as a live link.
 
 ### Prior use of the word Antumbra
 
@@ -380,8 +391,10 @@ before anything else hardens around the name.
       is the right TLD for a privacy browser: torproject.org, mozilla.org.
 - [ ] **Register `antumbrabrowser.com`** and redirect it to the `.org`.
 - [ ] **Register `getantumbra.com`** for download links and short URLs.
-- [ ] **Create the GitHub org `antumbra-browser`.** Confirmed available. Also
-      claim `antumbrabrowser` and `getantumbra` to prevent impersonation.
+- [x] **Create the GitHub org `antumbra-browser`.** Done. The org exists and
+      hosts the canonical repository.
+- [ ] Also claim `antumbrabrowser` and `getantumbra` defensively to prevent
+      impersonation. Both are still available.
 - [ ] Open a purchase inquiry on **`antumbra.com`**, which is openly listed for
       sale via Dynadot. Set a walk-away number first.
 - [ ] Watch **`antumbra.org`** (registered 2026-08-23 via Tucows, currently
@@ -424,12 +437,44 @@ before anything else hardens around the name.
 
 ### Repository
 
-- [ ] **Rename the GitHub repository** from `Umbra-Browser` to
-      `antumbra-browser` and move it under the new org. GitHub will redirect the
-      old URL, but update every link in the README and docs anyway.
+- [x] **Rename the GitHub repository** from `Umbra-Browser` to
+      `antumbra-browser` and move it under the new org. Done. The canonical URL
+      is now
+      [github.com/antumbra-browser/antumbra-browser](https://github.com/antumbra-browser/antumbra-browser).
+      GitHub redirects the old path, but treat that redirect as temporary and
+      update every link instead.
 - [ ] Rename the `Shroud`/`Relay` window strings to `Totality` across the
       codebase **before the string freeze**, while it is still cheap.
 - [ ] Update the local clone directory name to match.
+
+#### Migration follow-ups
+
+These depend on files that do not exist in the repository yet. Do each one at the
+moment the corresponding file is added, so nothing is created carrying the old
+path. In all of them, write the canonical URL directly and **do not rely on
+GitHub's redirect from the old path**: it is a courtesy, it disappears if anyone
+recreates a repository under the old name, and several consumers below never
+follow it at all.
+
+- [ ] **CI configuration.** Point workflow files, self-hosted runner
+      registrations, status-check URLs, deploy targets and any hardcoded
+      `owner/repo` pairs at `antumbra-browser/antumbra-browser`.
+- [ ] **README and docs badges.** Build, release, license and download badges
+      embed the full repository path in both the image URL and the link target.
+      Update both halves of every badge; a badge pointed at the old path silently
+      renders as "unknown" rather than failing loudly.
+- [ ] **Package metadata.** Set `repository`, `homepage` and `bugs` (or the
+      equivalent fields for whatever manifest formats ship) to the canonical URL,
+      including the Android and desktop packaging manifests and any F-Droid
+      metadata.
+- [ ] **Issue and pull request templates.** Update links inside
+      `.github/ISSUE_TEMPLATE/*`, the pull request template, `CONTRIBUTING.md`,
+      `SECURITY.md` and the code of conduct when they are written.
+- [ ] **Funding links.** Update `.github/FUNDING.yml` and any donation or
+      sponsorship URLs in the README, the site and the store listings.
+- [ ] **Everything else that hardcodes the path.** Release and update-check
+      endpoints, source links in the about dialog, crash-reporter URLs, the
+      website footer, and the AlternativeTo and F-Droid listings once they exist.
 
 ---
 

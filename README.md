@@ -45,7 +45,8 @@ that stops working if anyone recreates a repository under the old name.
 | Document | What is in it |
 |---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | How Antumbra is built: fork strategy, every feature costed by implementation layer, repo structure, build and CI, licensing. |
-| [ROADMAP.md](ROADMAP.md) | Milestones, starting with the smallest shippable desktop build. |
+| [ROADMAP.md](ROADMAP.md) | Milestones, starting with the smallest shippable desktop build, plus the Windows build machine setup. |
+| [DECISIONS.md](DECISIONS.md) | Decision log: what was decided, when, and why. The source of truth when documents disagree. |
 | [BRANDING.md](BRANDING.md) | Name research, trademark findings, icon specification, color tokens, pre-launch checklist. |
 
 Antumbra is a minimal-patch fork of Firefox (Gecko), licensed MPL 2.0. Nothing

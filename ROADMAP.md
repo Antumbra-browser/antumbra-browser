@@ -1,7 +1,8 @@
 # Antumbra: roadmap
 
 **Status: draft for review.** Written 2026-09-18. Sequences the work described in
-[ARCHITECTURE.md](ARCHITECTURE.md). Naming follows [BRANDING.md](BRANDING.md).
+[ARCHITECTURE.md](ARCHITECTURE.md), under the decisions recorded in
+[DECISIONS.md](DECISIONS.md). Naming follows [BRANDING.md](BRANDING.md).
 
 Estimates are **full-time-equivalent weeks for one experienced developer**, and
 they assume no prior Gecko experience, which adds a real learning curve to the
@@ -28,44 +29,269 @@ Three rules decide the sequence.
 
 ---
 
-## Milestone 0: decisions and groundwork
+## Milestone 0: groundwork
 
 **2 to 4 weeks. No shippable output. Do not skip it.**
 
-Every hour here saves days later. The deliverable is a repository that builds
-unmodified Firefox on your own hardware, plus the decisions in ARCHITECTURE.md
-section 13 actually made.
+Every hour here saves days later. The deliverable is a Windows machine that
+builds unmodified Firefox end to end, plus a repository skeleton ready to take
+patches.
 
-- [ ] Decide **ESR or Release** (ARCHITECTURE.md 3.2). Recommendation: ESR.
-- [ ] Decide **First-Party Isolation** (5.2). Recommendation: drop it, Total
-      Cookie Protection supersedes it.
-- [ ] Decide **Remote Settings** and **Safe Browsing** posture (5.8).
-- [ ] Decide **extension signing** posture (6.2), which determines whether
-      Obfuscation mode can ever be bundled.
-- [ ] Pin `upstream.conf` to a specific Firefox tag.
-- [ ] Build unmodified Firefox from source, end to end, on the target machine.
-      **Until this works, nothing else matters.** Expect this alone to take
-      several days the first time.
-- [ ] Stand up the self-hosted Linux builder (ARCHITECTURE.md 10.2) with
-      persistent `sccache`.
+The decisions that used to live in this milestone are made. See
+[DECISIONS.md](DECISIONS.md): ESR with a patch series (D6), Total Cookie
+Protection only (D1), Arti as a child process (D2), signing enforcement on (D3),
+VPN button at milestone 7 (D4), Remote Settings and Safe Browsing on and
+disclosed (D5), Windows first (D7). Four questions remain open and are listed at
+the end of that file.
+
+### Build machine setup (Windows)
+
+Antumbra is built on Windows first (D7), natively, on the maintainer's own
+desktop. Claude Code runs on that machine for build work. **Cloud sessions handle
+documentation, planning, patch review, and pref auditing, and must not attempt
+builds:** they have neither the disk nor the job time limit for a Firefox build.
+
+Mozilla's authoritative page is
+[Building Firefox On Windows](https://firefox-source-docs.mozilla.org/setup/windows_build.html).
+Follow it if anything below has drifted. These steps are that page plus the
+things worth knowing before you start.
+
+#### Before you begin: what actually determines build speed
+
+| Matters a lot | Matters a little | Does not matter |
+|---|---|---|
+| CPU core count | Windows 11 Dev Drive (5 to 10 percent) | **The GPU** |
+| RAM (link steps are memory-hungry) | | |
+| NVMe throughput | | |
+
+**The RTX 3080 will not shorten a single build.** Firefox compilation is
+CPU-bound and IO-bound and the GPU sits idle throughout. It earns its place on
+this project a different way: it is genuinely useful for testing Antumbra's
+graphics paths (WebRender, hardware video decode, compositor behavior), which is
+a real advantage of developing on a workstation rather than a build server.
+
+**RAM.** Mozilla's stated floor is 4 GB, with 8 GB or more recommended. Treat
+that as the absolute minimum to complete a build, not a target. For comfortable
+work: **16 GB minimum, 32 GB recommended.** Parallelism is what eats memory, and
+the link step is the peak. If a build dies during linking, reduce the job count
+before assuming something is broken.
+
+**Disk.** At least 40 GB free, and that is tight once you have an object
+directory, a `.mozbuild` toolchain cache, and `sccache`. Budget 150 to 200 GB.
+
+#### Step 1: folder locations
+
+Path choice causes more first-time Windows build failures than anything else.
+
+- **No spaces and no special characters** anywhere in the path. This is a hard
+  build failure, not a warning.
+- Keep paths short. Windows path length limits bite deep in the object
+  directory. Enable long path support if you hit file-not-found errors partway
+  through a build.
+- **Do not put the source tree inside OneDrive, Dropbox, or any synced folder.**
+  A sync client trying to upload a million intermediate object files will ruin
+  the machine's day and corrupt builds.
+
+Use the defaults, which are chosen to avoid all of this:
+
+```
+C:\mozilla-build      MozillaBuild itself
+C:\mozilla-source     the Firefox source tree
+%USERPROFILE%\.mozbuild   toolchains fetched by bootstrap
+```
+
+**Windows 11 Dev Drive:** if you have the spare capacity, create one and put
+`C:\mozilla-source` on it. Mozilla measures 5 to 10 percent faster builds. It is
+free performance on a machine that already has the SSD space.
+
+#### Step 2: Visual Studio Build Tools
+
+Firefox needs the MSVC toolchain. Recent versions of `bootstrap.py` can provision
+much of this for you, so run step 4 first and come back here only if it asks for
+a compiler.
+
+To install it explicitly, **Visual Studio Build Tools 2022** is sufficient; the
+full Visual Studio IDE is not required.
+
+```powershell
+winget install --id Microsoft.VisualStudio.2022.BuildTools --override ^
+  "--quiet --wait --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+```
+
+Or install interactively and select:
+
+- Workload: **Desktop development with C++**
+- Individual components: **MSVC v143 x64/x86 build tools**, the **Windows 11
+  SDK**, and **C++ ATL for latest v143 build tools (x86 and x64)**
+
+Reboot afterwards if the installer asks. Do not skip the ATL component: it is
+easy to miss and the failure it causes appears much later in the build.
+
+#### Step 3: MozillaBuild
+
+MozillaBuild is the MSYS2-based shell environment that carries the bash, Python,
+git, and assorted Unix tools the build system expects.
+
+1. Download `MozillaBuildSetup-Latest.exe` from
+   [ftp.mozilla.org/pub/mozilla/libraries/win32/](https://ftp.mozilla.org/pub/mozilla/libraries/win32/).
+2. **Accept the default install directory** (`C:\mozilla-build`).
+3. Make a shortcut to `C:\mozilla-build\start-shell.bat`. That shell, not
+   PowerShell or cmd, is where every build command runs.
+
+Two environment gotchas from Mozilla's docs, both of which produce confusing
+failures:
+
+- **Do not have a `PYTHON` environment variable set.**
+- If Cygwin is installed, **MozillaBuild's paths must come first in `PATH`.**
+
+#### Step 4: bootstrap and first checkout
+
+In the MozillaBuild shell:
+
+```bash
+cd /c/
+mkdir mozilla-source
+cd mozilla-source
+wget https://raw.githubusercontent.com/mozilla-firefox/firefox/refs/heads/main/python/mozboot/bin/bootstrap.py
+python3 bootstrap.py
+```
+
+Bootstrap clones the tree and fetches the toolchains (clang, Rust, cbindgen,
+nasm, Node). It will raise a **UAC prompt for PowerShell: answer Yes.** That step
+adds the Microsoft Defender exclusions described below automatically, and
+skipping it costs a large amount of build time for no benefit.
+
+Then pin to ESR per D6, rather than tracking `main`:
+
+```bash
+cd firefox
+git fetch --tags
+git checkout <FIREFOX_ESR_TAG>     # recorded in upstream.conf
+```
+
+#### Step 5: Windows Defender exclusions
+
+The single highest-leverage speed change on Windows. Real-time scanning inspects
+every one of the hundreds of thousands of files a build touches, and the cost is
+large.
+
+Bootstrap adds these for you if you accepted the UAC prompt. Verify them, and add
+them by hand if not, under Windows Security, Virus and threat protection,
+Manage settings, Exclusions:
+
+```
+C:\mozilla-build
+C:\mozilla-source
+%USERPROFILE%\.mozbuild
+```
+
+PowerShell, run as Administrator:
+
+```powershell
+Add-MpPreference -ExclusionPath "C:\mozilla-build"
+Add-MpPreference -ExclusionPath "C:\mozilla-source"
+Add-MpPreference -ExclusionPath "$env:USERPROFILE\.mozbuild"
+```
+
+If third-party antivirus is installed, exclude the same paths there too. It is
+usually the larger offender.
+
+#### Step 6: first build
+
+```bash
+cd /c/mozilla-source/firefox
+./mach build
+./mach run
+```
+
+**Until `./mach run` launches a working browser, nothing else in this roadmap
+matters.** Budget a day or two for this the first time, most of it spent on
+toolchain problems rather than on the build itself.
+
+#### Realistic build times
+
+Highly dependent on core count. Wide ranges because they are honest ones.
+
+| Build type | Time | When you use it |
+|---|---|---|
+| **Clean full build**, 8 cores | 60 to 120 minutes | First build, after a rebase, after a mozconfig change |
+| **Clean full build**, 16 cores | 30 to 60 minutes | Same |
+| **Incremental**, C++ change | 2 to 15 minutes | Editing Gecko. A widely included header touches everything and approaches a full rebuild. |
+| **`./mach build faster`** | Seconds to ~2 minutes | **Frontend only**: JS, CSS, XHTML, prefs, branding assets. This is most of Antumbra's milestone 1 work. |
+| **Artifact build** | 1 to 5 minutes | Frontend iteration only. See the warning below. |
+
+Two things that will save more time than any hardware upgrade:
+
+- **`./mach build faster` is the command you will live in.** Milestone 1 is
+  almost entirely branding, prefs, and one frontend onboarding patch, all of
+  which it rebuilds in seconds.
+- **Artifact builds** (`ac_add_options --enable-artifact-builds`) download
+  Mozilla's prebuilt binaries and build only the frontend, turning a 30-plus
+  minute build into 1 to 5 minutes. **They are for iteration only and can never
+  produce a release.** The downloaded binaries are Mozilla's official builds,
+  which means Mozilla branding and the telemetry we compile out are both present.
+  Keep a separate mozconfig for artifact builds so this can never be confused
+  with a release build.
+
+Set up **sccache** (bootstrap can configure it) so that rebuilds after a rebase
+reuse work instead of starting from zero. On a patch-series project that is a
+recurring, meaningful saving.
+
+#### Step 7: Claude Code on the build machine
+
+```powershell
+winget install OpenJS.NodeJS.LTS
+npm install -g @anthropic-ai/claude-code
+claude
+```
+
+A native Windows installer also exists; see the Claude Code docs at
+[code.claude.com/docs](https://code.claude.com/docs) for the current options.
+
+**The one integration detail that matters:** `mach` must run inside the
+MozillaBuild shell, not in PowerShell. Rather than rely on remembering that, add
+a wrapper to the repository so a single command works from anywhere:
+
+```bat
+:: scripts\mach.cmd
+@echo off
+C:\mozilla-build\start-shell.bat -c "cd /c/mozilla-source/firefox && ./mach %*"
+```
+
+Then `scripts\mach.cmd build faster` works from a normal terminal, and Claude
+Code can drive builds without a shell-environment detour every time.
+
+### Remaining milestone 0 checklist
+
+- [ ] Working `./mach run` on the Windows machine, per the steps above.
+- [ ] Defender exclusions verified, `sccache` configured, artifact-build mozconfig
+      kept separate from the release mozconfig.
+- [ ] Claude Code installed on the build machine, `scripts\mach.cmd` wrapper
+      working.
+- [ ] Pin `upstream.conf` to a specific Firefox ESR tag.
 - [ ] Create the repository skeleton from ARCHITECTURE.md section 9.2.
 - [ ] Write `THIRD-PARTY.md`, `SECURITY.md`, `CONTRIBUTING.md` (including the
       standing no-crypto, no-rewards, no-sponsored-content rule from spec section
       9).
 - [ ] Produce the icon set per BRANDING.md section 6, hand-tuned at 16, 32, and
       48px, all four mode variants.
-- [ ] Verify against the pinned base whether native vertical tabs are available
-      (ARCHITECTURE.md 6.8). This determines whether a headline design feature is
-      free or deferred.
+- [ ] Verify against the pinned ESR base whether native vertical tabs are
+      available (ARCHITECTURE.md 6.8). This determines whether a headline design
+      feature is free or deferred.
+- [ ] **Start the Windows code signing process now, not at milestone 2.**
+      Identity validation takes days and SignPath Foundation review takes longer.
+      See BRANDING.md's launch checklist.
+- [ ] Answer the four open questions in DECISIONS.md, or at least the funding one.
 
-**Definition of done:** `scripts/build.sh` produces a working, unbranded Firefox
-from a clean checkout on the builder, and CI runs the fast lane on every push.
+**Definition of done:** a clean checkout on the Windows machine produces a
+working, unbranded Firefox via one documented command, and CI runs the fast lane
+(pref audit, patch apply, lint) on every push.
 
 ---
 
 ## Milestone 1: the smallest shippable desktop build
 
-**6 to 10 weeks. The first public release. Linux x86_64 only.**
+**6 to 10 weeks. The first public release. Windows x86_64 only (D7).**
 
 This is the answer to "what is the smallest thing that is recognizably Antumbra
 and worth installing?" Everything in it is at layer 1 to 3 except the first-run
@@ -115,8 +341,12 @@ because onboarding is the differentiator.
   patched in. Decide in milestone 0.
 
 **Release**
-- Linux x86_64 tarball plus Flatpak, published on GitHub Releases with SHA-256
-  sums.
+- Windows x86_64 installer plus a portable ZIP, published on GitHub Releases with
+  SHA-256 sums.
+- **Signed if signing is in place, and honest about it if not.** If the
+  certificate has not landed by release, the download page must say plainly that
+  Windows will show a SmartScreen warning and what the user should expect. Do not
+  let a non-technical user meet that dialog unprepared.
 - A privacy policy that is accurate, including the Remote Settings and Safe
   Browsing disclosures from ARCHITECTURE.md 5.8.
 
@@ -124,7 +354,7 @@ because onboarding is the differentiator.
 
 Cookie clearing on tab close, the per-site consent panel, the privacy dashboard,
 Obfuscation mode, the hardened HTTP profile, Proton Pass, the Totality window,
-the VPN button, split view, web panels, Windows, macOS, Android, and the built-in
+the VPN button, split view, web panels, Linux, macOS, Android, and the built-in
 updater.
 
 That list is long on purpose. Each item is a milestone-1 delay and none of them
@@ -132,7 +362,11 @@ is required for the release to be genuinely useful and genuinely private.
 
 ### Definition of done
 
-- Installs and runs on a clean Ubuntu, Fedora, and Arch system.
+- Installs and runs on a clean Windows 10 and Windows 11 install, not just the
+  build machine.
+- **Daily-driven by the maintainer for at least two weeks before release.** This
+  is the point of building Windows first (D7), and it is a release gate, not a
+  suggestion.
 - Automated smoke test confirms every pref in `antumbra.js` is actually set in
   the shipped binary.
 - A network capture from first launch to five minutes idle contains **no
@@ -148,18 +382,27 @@ is required for the release to be genuinely useful and genuinely private.
 
 **8 to 12 weeks. The milestone that turns a project into a product.**
 
-Unglamorous and more important than any feature. Without it, Antumbra is a Linux
-enthusiast tool, which is the audience it was specifically not built for.
+Unglamorous and more important than any feature. Without it, Antumbra is one
+person's Windows build, which is not a product.
 
-- [ ] **Windows x86_64 build** in CI, plus code signing certificate, HSM key
-      custody, and an installer. Unsigned Windows binaries trigger SmartScreen
-      and will destroy install conversion.
+- [ ] **Windows code signing in place**, if it did not land during milestone 1.
+      Unsigned binaries trigger SmartScreen warnings that will destroy install
+      conversion. Options, costs, and the free open source route are in
+      BRANDING.md's launch checklist.
+- [ ] **Register the Windows desktop as a self-hosted GitHub Actions runner**
+      (D7), so Windows release builds stop depending on someone being at the
+      keyboard. Never run self-hosted jobs on pull requests from forks.
+- [ ] **Linux x86_64 build** in CI, on GitHub larger runners, plus a tarball and
+      Flatpak. Cheapest platform technically; it waited only because nobody was
+      daily-driving it.
 - [ ] **macOS universal build**, Apple Developer Program membership,
       notarization, DMG packaging. Without notarization, Gatekeeper blocks it.
 - [ ] **Built-in updater**: MAR signing keys generated and placed in documented
       custody, an update endpoint, and the build change. Losing this key ends the
       ability to update every installed copy.
-- [ ] Package manager presence: Flatpak, AUR, Homebrew cask, winget.
+- [ ] Package manager presence: winget first (it is the Windows audience's
+      update path before the built-in updater exists), then Flatpak, AUR, and a
+      Homebrew cask.
 - [ ] Publish the **security response commitment** in `SECURITY.md` with a
       specific day count, and demonstrate it by shipping the first upstream
       security release on schedule.
@@ -167,9 +410,9 @@ enthusiast tool, which is the audience it was specifically not built for.
       it is compiled out. This means good, structured issue templates and clear
       reproduction guidance.
 
-**Definition of done:** a non-technical user on Windows or macOS can download,
-install, and receive an automatic update, with no security warnings anywhere in
-the flow.
+**Definition of done:** a non-technical user on Windows, Linux, or macOS can
+download, install, and receive an automatic update, with no security warnings
+anywhere in the flow.
 
 ---
 
@@ -354,11 +597,13 @@ available, the roadmap should be cut, not compressed.
 | **Security update lag** | Medium | Fatal to trust | Automated rebase and build on upstream tag, published SLA, ship before features. |
 | **Cookie clearing logs users out** | High | Severe churn | Conservative defaults, in-context allowlist, the 200-site corpus in milestone 3. |
 | **VPN affiliate links define the narrative** | Medium | Severe reputational | Milestone 7 placement, disclosure in the panel, the CI test, and never touching typed URLs. |
-| **Signing costs or certificate issuance blocks release** | Medium | Delays milestone 2 | Start the certificate process during milestone 1, not at the end. Issuance takes weeks. |
+| **Signing or certificate issuance blocks release** | Medium | Delays milestone 1 | Start the process in milestone 0, not milestone 2. Identity validation takes days and SignPath Foundation review takes longer. A free or 10 USD per month route exists; see BRANDING.md. |
+| **SmartScreen warnings on early releases** | **High, expect it** | Severe conversion loss | Reputation accrues per signing identity over downloads, and since 2024 not even EV bypasses it. Sign consistently from the first release so reputation starts accumulating, and warn users on the download page until it clears. |
 | **Split view consumes the maintenance budget** | Medium | Severe | Scheduled last within milestone 4, explicitly droppable. |
 | **Totality window leaks** | Medium | Fatal to trust | Treat leak testing, not routing, as the deliverable. Do not ship it until a capture proves it. |
 | **Trademark objection to Antumbra** | Low to medium | Severe rework | The Class 9 and 42 clearance opinion in BRANDING.md, done before launch, not after. |
 | **Solo-dev bus factor** | Certain over time | Fatal | Patch series over forked tree, everything documented, the repository buildable by a stranger from `README.md` alone. |
+| **Single build machine is a single point of failure** | Medium | Weeks lost | Everything needed to rebuild the environment is in milestone 0's setup steps. Move to the self-hosted runner in milestone 2 so builds are reproducible off one keyboard. |
 | **Google Play rejection on Android** | Medium | Delays milestone 8 | Read policy first, F-Droid and direct APK as the fallback distribution. |
 
 ---

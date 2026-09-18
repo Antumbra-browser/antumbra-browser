@@ -8,8 +8,9 @@ feature in the spec is implemented, what it costs a solo developer to build and
 to keep alive across Firefox releases, and where it will break sites. It is a
 plan, not a description of existing code. Nothing here has been built yet.
 
-Companion document: [ROADMAP.md](ROADMAP.md) sequences this work into
-milestones.
+Companion documents: [ROADMAP.md](ROADMAP.md) sequences this work into
+milestones, and [DECISIONS.md](DECISIONS.md) records the decisions behind it with
+their reasoning. Where this document says "decided", DECISIONS.md says why.
 
 ---
 
@@ -105,7 +106,7 @@ what a feature did, we should think harder about whether it did anything.
 
 ### 3.1 A patch series, not a forked tree
 
-**Decision: maintain a patch series applied to a pinned upstream tag, not a
+**Decided (D6): maintain a patch series applied to a pinned upstream tag, not a
 long-lived fork of mozilla-central.**
 
 This is the single most important structural decision in the project. The
@@ -136,8 +137,8 @@ the existence proof.
 | Feature lag | Up to 12 months behind | None |
 | Realistic solo-dev load | 1 hard week per year plus light monthly work | 1 to 3 days every 4 weeks, forever |
 
-**Decision: start on ESR.** The annual rebase is a scheduled, bounded event that
-can be planned around. The 4-week treadmill is not, and it is the thing most
+**Decided (D6): base on ESR.** The annual rebase is a scheduled, bounded event
+that can be planned around. The 4-week treadmill is not, and it is the thing most
 likely to end the project in year one.
 
 The cost is real and should be understood: privacy improvements that land in
@@ -217,10 +218,11 @@ means site operators already test against it.
 
 ### 5.2 Total Cookie Protection and First-Party Isolation
 
-**Layer 1, prefs. But the spec has a conflict here that needs resolving.**
+**Layer 1, prefs. Decided (D1).**
 
-The spec asks for Total Cookie Protection **and** First-Party Isolation. These
-are two generations of the same idea and they should not both be on.
+The original spec asked for Total Cookie Protection **and** First-Party
+Isolation. These are two generations of the same idea and they should not both be
+on.
 
 - **First-Party Isolation** (`privacy.firstparty.isolate`) is the older, blunter
   mechanism, inherited from Tor Browser's work. It is effectively deprecated
@@ -232,9 +234,10 @@ are two generations of the same idea and they should not both be on.
   flows working, and it is what Firefox ships on Strict. Tor Browser itself
   migrated from FPI to dFPI.
 
-**Recommendation: ship Total Cookie Protection, do not ship First-Party
-Isolation.** Enabling both produces unpredictable interactions and a worse user
-experience for no measurable privacy gain.
+**Decided: ship Total Cookie Protection everywhere. First-Party Isolation is
+off in Standard, Strict, and Blackout mode, and enabled only inside the Totality
+window.** Enabling both globally produces unpredictable interactions and a worse
+user experience for no measurable privacy gain.
 
 ```
 network.cookie.cookieBehavior = 5
@@ -244,9 +247,12 @@ privacy.partition.always_partition_third_party_non_cookie_storage = true
 privacy.firstparty.isolate = false
 ```
 
-If you want the FPI-level guarantee anyway, the honest place for it is **Totality
-window only**, where the user has already accepted that things will break. That
-is a one-line addition to the Totality window profile, not a global default.
+The Totality window sets `privacy.firstparty.isolate = true` on top of the
+above. That is the one context where the user has already accepted that things
+will break, and where breakage is expected for unrelated reasons anyway (blocked
+exit nodes, CAPTCHAs). It is a one-line addition to the Totality window profile,
+not a global default. If upstream removes the pref entirely, the Totality window
+loses that single extra guarantee and nothing else changes.
 
 Complexity: **trivial.** Maintenance: **low**, watch for the eventual removal of
 the FPI pref entirely. Breakage: **medium**, mostly single-sign-on and embedded
@@ -457,14 +463,14 @@ expect. It carries:
 - The public suffix list and HSTS preload updates
 - Also, the things we do not want: Normandy recipes, study definitions
 
-**Recommendation: keep Remote Settings on, disable Normandy and studies
+**Decided (D5): keep Remote Settings on, disable Normandy and studies
 specifically, and document the connection prominently in the onboarding and the
 dashboard.** Turning it off costs real security (stale revocation data is a
 genuine risk) to buy a purity claim. Self-hosting a Remote Settings mirror is the
 correct long-term answer and belongs in a later milestone, not milestone 1.
 
-Same reasoning for **Safe Browsing**: keep the local list-based malware and
-phishing checks on, because our audience is exactly the audience that gets
+Same reasoning for **Safe Browsing**, and decided the same way (D5): keep the
+local list-based malware and phishing checks on, because our audience is exactly the audience that gets
 phished, but turn off the per-download remote lookup that sends URLs to Google:
 
 ```
@@ -648,19 +654,23 @@ say:
 3. **It costs bandwidth and battery**, which matters especially on Android and
    on metered connections.
 
-Practical obstacle: **AdNauseam was delisted from addons.mozilla.org in 2017** and
-is self-distributed. Bundling it therefore requires either Mozilla signing it for
-self-distribution (unlikely, given it was blocked) or building Antumbra with
-`MOZ_REQUIRE_SIGNING=0`, which LibreWolf does. That build flag has a broader
-consequence: it also permits users to install any unsigned extension, which is a
-security loosening we should make deliberately and state in the docs, not
-stumble into.
+**Distribution, decided (D3): install the signed build from addons.mozilla.org,
+and leave extension signature enforcement on.**
 
-If we would rather not loosen signing, the fallback is to make Obfuscation mode a
-documented link-out rather than a bundled component. That is the safer default
-and probably the right milestone-1-through-5 answer.
+An earlier draft of this document assumed AdNauseam was still self-distributed
+following its 2017 removal from AMO, and on that basis floated building with
+`MOZ_REQUIRE_SIGNING=0`. That assumption was wrong. AdNauseam is listed on AMO and
+is signed and installable (verified 2026-09-18). That removes any reason to weaken
+signing, so:
 
-AdNauseam is also **GPLv3** and is a uBlock Origin fork, so it cannot run
+- **Antumbra ships with `xpinstall.signatures.required` enforced**, and does not
+  set `MOZ_REQUIRE_SIGNING=0`. Disabling enforcement would have loosened security
+  for every extension a user ever installs, in order to enable one optional
+  feature.
+- Enabling Obfuscation mode installs the AMO build through the normal install
+  flow, pinned to a reviewed version like every other bundled component.
+
+AdNauseam is **GPLv3** and is a uBlock Origin fork, so it cannot run
 alongside uBlock Origin: enabling Obfuscation mode swaps one for the other, which
 means filter list settings must be migrated between them. Add that to the
 complexity.
@@ -751,9 +761,9 @@ major undertaking: its embedding API is still evolving, and linking a large
 async Rust stack into the Firefox build introduces build complexity and a new
 class of crash.
 
-**Recommendation: two stages.**
+**Decided (D2): two stages.**
 
-1. **Stage 1: Arti as a bundled child process exposing SOCKS5.** Antumbra
+1. **Stage 1: Arti as a supervised child process exposing SOCKS5.** Antumbra
    launches it, waits for bootstrap, and points the Totality window's proxy
    settings at it. This is how Brave ships Tor windows (with C tor), it is well
    understood, and the failure modes are contained: if the process dies, the
@@ -829,9 +839,10 @@ are placeholders until supplied:
 | Proton VPN | `[INSERT LINK]` | Independent, Swiss, open source clients |
 
 Complexity: **low**, three to five days. Maintenance: **very low.** Breakage:
-**none technical, high reputational.** Recommendation: **do not ship this in
-milestone 1.** Ship it once the browser has an established privacy record, so
-that it reads as a funding model rather than as the point of the project.
+**none technical, high reputational.** Decided (D4): **milestone 7, after the
+Totality window.** It ships once the browser has an established privacy record,
+so that it reads as a funding model rather than as the point of the project. The
+CI rule above is permanent and does not depend on that sequencing.
 
 ### 6.7 Container tabs
 
@@ -939,7 +950,7 @@ recurring cost per upstream release.
 |---|---|---|---|---|---|---|
 | 1.1 | Strict ETP | Prefs | Trivial | Very low | Low | MPL 2.0 |
 | 1.2 | Total Cookie Protection | Prefs | Trivial | Low | Medium | MPL 2.0 |
-| 1.2b | First-Party Isolation | Prefs | Trivial | Low | High | **Recommend dropping**, superseded by TCP |
+| 1.2b | First-Party Isolation | Prefs | Trivial | Low | High | **Totality window only (D1)**, superseded by TCP elsewhere |
 | 1.3 | Fingerprinting resistance | Prefs | Low | Low | Medium (FPP) / High (RFP) | MPL 2.0 |
 | 1.3b | Per-site FP exceptions UI | Chrome patch | Medium | Medium | None | MPL 2.0 |
 | 1.4 | WebRTC leak protection | Prefs | Trivial | Very low | Low | MPL 2.0 |
@@ -953,7 +964,7 @@ recurring cost per upstream release.
 | 2.C | Clear on tab close | Own extension | **High** | Low | **High** | MPL 2.0; Open Cookie Database separately licensed |
 | 2.D | Per-site consent panel | Chrome patch + extension | Medium to high | Medium | None | MPL 2.0 |
 | 3 | uBlock Origin preinstalled | Policy + bundle | Low | Low | Medium | GPLv3, aggregated |
-| 3b | Obfuscation mode (AdNauseam) | Bundle swap | Medium | Low | Medium | GPLv3, aggregated; **legal and ethical caveats** |
+| 3b | Obfuscation mode (AdNauseam) | Signed AMO install | Medium | Low | Medium | GPLv3; signing enforcement stays on (D3); **legal and ethical caveats** |
 | 4 | HTTPS-First | Prefs | Trivial | Very low | Low | MPL 2.0 |
 | 4b | Hardened HTTP profile | Extension + chrome patch | Medium | Medium | Medium to high | MPL 2.0 |
 | 5 | Passwords, primary password default | Prefs + onboarding | Low | Very low | None | MPL 2.0 |
@@ -1082,26 +1093,45 @@ no compiled-code changes, and we do.
 
 Cross-platform realities:
 
-- **Linux**: the primary and cheapest target. Start here.
-- **Windows**: Mozilla supports cross-compiling from Linux, but the Windows SDK
-  licensing makes that awkward to distribute from CI. Building on Windows is the
-  path of least resistance. Code signing now requires an OV or EV certificate
-  with hardware or cloud HSM key storage, roughly 200 to 600 USD per year, and
-  unsigned Windows binaries trigger SmartScreen warnings that will destroy
-  install conversion for non-technical users.
+- **Windows: the first target (D7).** Built natively on the maintainer's own
+  desktop, which is also the machine Antumbra is daily-driven on. Cross-compiling
+  from Linux is possible but the SDK licensing makes it awkward to distribute
+  from CI, and building on Windows removes that problem entirely. Code signing is
+  a milestone 2 blocker: unsigned Windows binaries trigger SmartScreen warnings
+  that will destroy install conversion for exactly the non-technical audience
+  Antumbra targets. Options and costs are in BRANDING.md's launch checklist.
+- **Linux**: the cheapest target technically (no signing, no notarization,
+  simplest toolchain), which is why it was originally proposed first. It moves to
+  milestone 2 and is built in CI. See D7 for why daily-driving beat cheapness.
 - **macOS**: requires Apple's SDK, which cannot be redistributed, so either build
   on a Mac or supply the SDK yourself. Distribution requires an Apple Developer
   Program membership (99 USD per year) and notarization. Without notarization,
   Gatekeeper blocks the app for ordinary users.
 
-**These signing costs are a hard prerequisite for the non-technical audience, not
-an optimization.** A browser that shows a scary warning on install has failed
-before it launches. Budget roughly 300 to 700 USD per year for signing across
-platforms.
+**Signing is a hard prerequisite for the non-technical audience, not an
+optimization.** A browser that shows a scary warning on install has failed before
+it launches.
+
+**GPUs do not build browsers.** Worth stating because it is a common assumption:
+Firefox compilation is CPU-bound and IO-bound. Cores, RAM, and NVMe throughput
+determine build times. A discrete GPU sits idle throughout. It is genuinely
+useful for *testing* Antumbra's graphics paths (WebRender, hardware video decode,
+compositor behavior), which is a real benefit of building on a workstation, but
+it will not shorten a single build.
 
 ### 10.2 Does this need a self-hosted runner
 
-**Yes, for full builds. No, for the fast checks.**
+**Eventually yes, and it is the maintainer's own Windows desktop (D7). Not
+yet.**
+
+**Milestones 0 and 1 have no CI builder at all.** Builds run locally on the
+Windows machine, driven by Claude Code installed on that machine. Cloud sessions
+handle documentation, planning, patch review, and pref auditing, and **must not
+attempt builds**: they have neither the disk nor the job time limit for a Firefox
+build. That separation of duties is deliberate, not a limitation to work around.
+
+From milestone 2, when Linux and macOS builds are needed, the question becomes
+real, and the answer is below.
 
 GitHub-hosted standard runners give roughly 4 vCPUs, 16 GB RAM, and on the order
 of 14 GB of usable free disk, against a 6 hour job limit. A Firefox checkout plus
@@ -1116,8 +1146,12 @@ Three options:
 | GitHub larger runners | Per-minute, adds up fast at multi-hour builds | Viable, no hardware to own. Good for occasional macOS and Windows builds. |
 | **Self-hosted** | One machine | **Recommended for the Linux builder.** A 16-core, 64 GB, 1 TB NVMe box, with a persistent `sccache` directory, turns a nightly into something that finishes while you sleep. |
 
-Recommended shape: **one self-hosted Linux builder** doing the heavy work, plus
-GitHub larger runners called on demand for Windows and macOS release builds.
+Recommended shape from milestone 2: **the maintainer's Windows desktop registered
+as a self-hosted runner** for Windows builds, plus GitHub larger runners called on
+demand for Linux and macOS. That inverts the usual arrangement, and it follows
+from D7: the machine that already builds Windows locally is the machine that
+should keep building it, and Linux is now the target that needs borrowed
+hardware.
 
 **Security rule, non-negotiable if the repository is public:** never run
 self-hosted runner jobs on pull requests from forks. A self-hosted runner
@@ -1170,7 +1204,7 @@ GPL-compatible as a secondary license, which keeps future options open.
 |---|---|---|---|
 | Firefox / Gecko | MPL 2.0 | Same license | Keep headers, publish modified source |
 | uBlock Origin | GPLv3 | Aggregation, not linking | Ship unmodified, include license, provide corresponding source |
-| AdNauseam | GPLv3 | Same | Same, plus the caveats in section 6.2 |
+| AdNauseam | GPLv3 | Aggregation, not linking | Installed from AMO as the signed build (D3); include license, provide corresponding source; caveats in section 6.2 |
 | Consent-O-Matic | MIT | Permissive | Attribution |
 | Multi-Account Containers | MPL 2.0 | Same license | Keep headers |
 | Proton Pass | GPLv3 | **Not bundled**, offered as a link | None |
@@ -1246,27 +1280,34 @@ ship within N days of upstream, where N is a number that can actually be met.
 
 ## 13. Open questions
 
-Recorded so they are decided deliberately rather than by default.
+Seven of the original ten are now decided. See [DECISIONS.md](DECISIONS.md) for
+the reasoning behind each.
 
-1. **First-Party Isolation.** Section 5.2 recommends dropping it in favor of
-   Total Cookie Protection. This contradicts the spec and needs a decision.
-2. **ESR or Release.** Section 3.2 recommends ESR. It costs feature freshness.
-3. **Remote Settings.** Section 5.8 recommends keeping it for security data and
-   disclosing it. A stricter reading of "zero telemetry" would remove it and
-   accept stale certificate revocation.
-4. **Safe Browsing.** Section 5.8 recommends keeping local list checks for a
-   non-technical audience. Many privacy forks disable it entirely.
-5. **Extension signing.** Bundling AdNauseam requires
-   `MOZ_REQUIRE_SIGNING=0`, which loosens security for all extensions. Section 6.2
-   recommends making Obfuscation mode a link-out instead, at least initially.
-6. **Split view.** Section 6.8 flags it as the worst maintenance-to-value ratio
-   in the spec. Confirm it is worth a permanent annual cost.
-7. **Search default.** Not in the spec, but every browser must answer it, and it
-   is the most obvious non-affiliate revenue source. Decide before launch, and
-   decide whether taking search revenue is compatible with the positioning.
-8. **VPN button timing.** Section 6.6 recommends deferring past launch.
-9. **Default DNS resolver.** Section 5.7 requires an editorial choice with real
-   privacy consequences. Document the reasoning publicly.
-10. **Funding.** Signing certificates, a builder machine, a domain, and a
-    trademark opinion are roughly 1,500 to 3,000 USD in year one before anyone is
-    paid for their time. The roadmap assumes this is covered.
+### Decided
+
+| Was | Decision | Reference |
+|---|---|---|
+| First-Party Isolation | Total Cookie Protection only, FPI confined to the Totality window | D1 |
+| Arti embedding | Supervised child process first, in-process later | D2 |
+| Extension signing | Signing enforcement stays on; AdNauseam installs from AMO as the signed build | D3 |
+| VPN button timing | Milestone 7, after the privacy work | D4 |
+| Remote Settings | On, with Normandy and studies off, disclosed | D5 |
+| Safe Browsing | Local list checks on, per-download remote lookup off, disclosed | D5 |
+| ESR or Release | ESR, with a patch series over a pinned tag | D6 |
+| Build platform | Windows first, built locally; Linux and macOS at milestone 2 via CI | D7 |
+
+### Still open
+
+1. **Split view.** Section 6.8 flags it as the worst maintenance-to-value ratio
+   in the spec. Confirm it is worth a permanent annual cost. Needed by milestone
+   4.
+2. **Search default.** Not in the original spec, but every browser must answer
+   it, and it is the most obvious non-affiliate revenue source. Decide whether
+   taking search revenue is compatible with the positioning. Needed by milestone
+   1.
+3. **Default DNS resolver.** Section 5.7 requires an editorial choice with real
+   privacy consequences. Document the reasoning publicly. Needed by milestone 1.
+4. **Funding.** A signing arrangement, a domain, and a trademark clearance
+   opinion are real year-one costs before anyone is paid for their time. Windows
+   signing in particular has a free path for open source projects and several
+   low-cost ones; see BRANDING.md's launch checklist. Needed by milestone 0.

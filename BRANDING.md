@@ -426,6 +426,53 @@ before anything else hardens around the name.
 - [ ] Pick and document the license, and make sure the trademark position is
       stated separately from it. Code can be free while the name is not.
 
+### Distribution and code signing
+
+- [ ] **Arrange Windows code signing before the first public release.** This is
+      a launch blocker, not a polish item. Windows is the first target and the
+      audience is non-technical, so an unsigned binary meets them with Microsoft
+      Defender SmartScreen's "Windows protected your PC" dialog, which most
+      people correctly read as "this is malware" and close.
+
+      Two facts that change the usual advice:
+
+      1. **EV certificates no longer bypass SmartScreen.** They did until 2024;
+         Microsoft removed that behavior. EV-signed files now build reputation
+         exactly like OV-signed ones, so paying the EV premium purely to avoid
+         warnings is no longer justified.
+      2. **Reputation accrues per signing identity across releases.** Signing
+         consistently from the very first release means later releases inherit
+         trust. Changing signing identity resets it, so pick one and stay on it.
+
+      Options, cheapest first:
+
+      | Option | Cost | Notes |
+      |---|---|---|
+      | **SignPath Foundation** | **Free** | Free code signing for qualifying open source projects, providing OV-level signing through a managed pipeline. Antumbra should qualify: OSI-approved license (MPL 2.0), public repository, no proprietary components. Requires the project to be actively maintained and already released in the form being signed, so apply during milestone 0 but expect to need a release first. Microsoft's own guidance points open source developers here. |
+      | **Azure Artifact Signing** (formerly Trusted Signing) | ~10 USD per month | Microsoft's recommended option for non-Store distribution. No hardware token; signs directly from CI. **Individuals are limited to the USA and Canada**; organizations may also be in the EU or UK. Identity validation takes a few business days. |
+      | **Certum Open Source Code Signing** | ~30 EUR per year, plus ~69 to 85 EUR once for the card and reader | Long-established low-cost route for open source developers, used by several well-known projects. Note that from 2026-02-27 a single code signing certificate is valid for at most 459 days, so multi-year purchases require reissues. |
+      | **Standard OV certificate** (DigiCert, Sectigo, GlobalSign) | 150 to 300 USD per year | The fallback if the above do not fit, mainly for developers outside the Azure Artifact Signing regions. Since June 2023 the CA/Browser Forum requires the private key to live on an HSM or hardware token, so add that cost and the key custody procedure. |
+      | **Microsoft Store as MSIX** | Free | Microsoft re-signs the package, so users see no warnings at all. Worth evaluating as a *secondary* channel: it reaches non-technical users well, but it must never become the only channel, since direct download has to keep working. |
+      | **EV certificate** | 400 USD and up per year | **Not recommended.** No SmartScreen advantage since 2024. |
+
+      Sources:
+      [Code signing options for Windows app developers (Microsoft Learn)](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options),
+      [SignPath Foundation conditions for open source projects](https://signpath.org/terms),
+      [Azure Trusted Signing pricing](https://azure.microsoft.com/en-us/pricing/details/trusted-signing/),
+      [Certum code signing shop](https://shop.certum.eu/code-signing.html).
+
+- [ ] **Start the signing process during milestone 0.** Identity validation takes
+      days and SignPath Foundation review takes longer. Beginning at release time
+      means shipping unsigned.
+- [ ] **Until signing is in place, say so on the download page.** Tell users
+      plainly that Windows will show a warning and what to expect. A surprised
+      non-technical user is a lost one.
+- [ ] Plan **macOS notarization** (Apple Developer Program, 99 USD per year)
+      before the macOS build lands. Without it, Gatekeeper blocks the app
+      outright, which is a harder stop than SmartScreen.
+- [ ] Document **key custody** for whichever route is chosen, alongside the MAR
+      update-signing key. Losing either one is unrecoverable.
+
 ### Assets
 
 - [ ] Produce the icon at 16, 32, 48, 128, 256 and 512px, **hand-tuned at 16, 32

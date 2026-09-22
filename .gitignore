@@ -1,0 +1,20 @@
+# Never commit the Firefox source tree, build output, or toolchains.
+# These live beside this repository under D:\dev\antumbra, but they are
+# listed here as well so a nested checkout can never be committed by accident.
+firefox/
+.mozbuild/
+obj-*/
+upstream/
+
+# Build and packaging artifacts
+*.exe
+*.zip
+*.tar.*
+*.mar
+dist/
+
+# Editor and OS noise
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

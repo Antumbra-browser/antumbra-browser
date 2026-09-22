@@ -56,6 +56,30 @@ Mozilla's authoritative page is
 Follow it if anything below has drifted. These steps are that page plus the
 things worth knowing before you start.
 
+**These steps must run in a Claude Code session on the build machine itself.**
+A cloud session has neither the disk nor the job time limit for a Firefox build,
+which is what D7 means by cloud sessions handling documentation and planning
+only. Run `scripts/setup-windows.ps1 -DryRun` first; it validates the drive and
+prints everything it would change before touching anything.
+
+#### The build machine
+
+| | |
+|---|---|
+| CPU | Intel i7-11700, 8 physical cores, 16 threads |
+| RAM | 64 GB |
+| GPU | NVIDIA RTX 3080 (irrelevant to build speed; see below) |
+| OS | Windows 11 Home 25H2 |
+| Build drive | `D:`, an SSD shared with games |
+
+**64 GB removes the memory constraint entirely.** The warning elsewhere in this
+document about reducing the job count when a build dies while linking does not
+apply to this machine. Run `mach` at its default, which will use all 16 threads.
+Core count, not memory, is the limit here.
+
+**The drive is shared with games, so Defender exclusions are scoped to three
+specific paths and never to `D:` as a whole.** See step 5.
+
 #### Before you begin: what actually determines build speed
 
 | Matters a lot | Matters a little | Does not matter |
@@ -72,12 +96,17 @@ a real advantage of developing on a workstation rather than a build server.
 
 **RAM.** Mozilla's stated floor is 4 GB, with 8 GB or more recommended. Treat
 that as the absolute minimum to complete a build, not a target. For comfortable
-work: **16 GB minimum, 32 GB recommended.** Parallelism is what eats memory, and
-the link step is the peak. If a build dies during linking, reduce the job count
-before assuming something is broken.
+work: **16 GB minimum, 32 GB recommended.** Parallelism is what eats memory and
+the link step is the peak, so on a constrained machine, reduce the job count
+before assuming a build that died while linking is broken.
+
+**This machine has 64 GB, so none of that applies to it.** Run at the default job
+count. Memory guidance is kept here for anyone reproducing the build elsewhere.
 
 **Disk.** At least 40 GB free, and that is tight once you have an object
-directory, a `.mozbuild` toolchain cache, and `sccache`. Budget 150 to 200 GB.
+directory, a toolchain cache, and `sccache`. Budget 150 to 200 GB. On a drive
+shared with games this is the constraint most likely to bite, so check it first:
+`scripts/setup-windows.ps1 -DryRun` reports free space and warns below 150 GB.
 
 #### Step 1: folder locations
 
@@ -92,17 +121,46 @@ Path choice causes more first-time Windows build failures than anything else.
   A sync client trying to upload a million intermediate object files will ruin
   the machine's day and corrupt builds.
 
-Use the defaults, which are chosen to avoid all of this:
+The layout, all on the build drive:
 
 ```
-C:\mozilla-build      MozillaBuild itself
-C:\mozilla-source     the Firefox source tree
-%USERPROFILE%\.mozbuild   toolchains fetched by bootstrap
+D:\dev\antumbra\                    build root
+D:\dev\antumbra\antumbra-browser\   this git repository
+D:\dev\antumbra\firefox\            Firefox ESR source and object directories
+D:\dev\antumbra\.mozbuild\          MOZBUILD_STATE_PATH, toolchain cache
+C:\mozilla-build\                   MozillaBuild itself (keep the default)
 ```
+
+`D:\dev\antumbra` has no spaces and is not inside OneDrive.
+`scripts/setup-windows.ps1` verifies both, plus free space, before it changes
+anything.
+
+**The repository and the source tree are siblings, not nested.** That is
+deliberate: it makes committing the Firefox tree or an object directory
+structurally impossible rather than merely forbidden. The repository's
+`.gitignore` also covers `firefox/`, `.mozbuild/`, and `obj-*/` as a second
+layer, in case a checkout ever ends up nested.
+
+**MozillaBuild stays at `C:\mozilla-build`.** Mozilla's docs say to accept the
+default, it is small, and it is a toolchain rather than source or build output.
+Only the things that grow to tens of gigabytes need to be on `D:`.
+
+**`MOZBUILD_STATE_PATH` is the one that is easy to miss.** Mozilla's toolchain
+cache defaults to `%USERPROFILE%\.mozbuild` on `C:` and reaches several
+gigabytes. Point it at the build drive:
+
+```powershell
+[Environment]::SetEnvironmentVariable(
+  'MOZBUILD_STATE_PATH', 'D:\dev\antumbra\.mozbuild', 'User')
+```
+
+Set this **before** running bootstrap, or the toolchains land on `C:` and have to
+be re-fetched. `scripts/setup-windows.ps1` sets it for you. Open a new shell
+afterwards so the variable is picked up.
 
 **Windows 11 Dev Drive:** if you have the spare capacity, create one and put
-`C:\mozilla-source` on it. Mozilla measures 5 to 10 percent faster builds. It is
-free performance on a machine that already has the SSD space.
+`D:\dev\antumbra` on it. Mozilla measures 5 to 10 percent faster builds. It is
+free performance on a drive that already has the space.
 
 #### Step 2: Visual Studio Build Tools
 
@@ -146,15 +204,20 @@ failures:
 
 #### Step 4: bootstrap and first checkout
 
-In the MozillaBuild shell:
+First confirm `MOZBUILD_STATE_PATH` is set from step 1, or the toolchains land on
+`C:`. In the MozillaBuild shell:
 
 ```bash
-cd /c/
-mkdir mozilla-source
-cd mozilla-source
+echo $MOZBUILD_STATE_PATH      # expect D:\dev\antumbra\.mozbuild
+
+cd /d/dev/antumbra
 wget https://raw.githubusercontent.com/mozilla-firefox/firefox/refs/heads/main/python/mozboot/bin/bootstrap.py
 python3 bootstrap.py
 ```
+
+MozillaBuild is an MSYS2 environment, so `D:\dev\antumbra` is `/d/dev/antumbra`
+inside that shell. The `scripts\mach.cmd` wrapper handles this translation for
+you afterwards.
 
 Bootstrap clones the tree and fetches the toolchains (clang, Rust, cbindgen,
 nasm, Node). It will raise a **UAC prompt for PowerShell: answer Yes.** That step
@@ -175,31 +238,44 @@ The single highest-leverage speed change on Windows. Real-time scanning inspects
 every one of the hundreds of thousands of files a build touches, and the cost is
 large.
 
-Bootstrap adds these for you if you accepted the UAC prompt. Verify them, and add
-them by hand if not, under Windows Security, Virus and threat protection,
-Manage settings, Exclusions:
+**Scope the exclusions to these three paths. Never exclude a whole drive.** `D:`
+also holds games and general files; excluding all of it would turn a build
+optimization into a standing security hole on the largest volume in the machine.
 
 ```
-C:\mozilla-build
-C:\mozilla-source
-%USERPROFILE%\.mozbuild
+D:\dev\antumbra\firefox       source tree and object directories
+D:\dev\antumbra\.mozbuild     toolchain cache
+C:\mozilla-build              MozillaBuild
 ```
 
-PowerShell, run as Administrator:
+`scripts/setup-windows.ps1` adds exactly these and nothing else. To do it by
+hand, in an **Administrator** PowerShell:
 
 ```powershell
+Add-MpPreference -ExclusionPath "D:\dev\antumbra\firefox"
+Add-MpPreference -ExclusionPath "D:\dev\antumbra\.mozbuild"
 Add-MpPreference -ExclusionPath "C:\mozilla-build"
-Add-MpPreference -ExclusionPath "C:\mozilla-source"
-Add-MpPreference -ExclusionPath "$env:USERPROFILE\.mozbuild"
 ```
 
-If third-party antivirus is installed, exclude the same paths there too. It is
-usually the larger offender.
+Verify what is actually excluded, which is worth doing since a typo silently
+buys nothing:
+
+```powershell
+(Get-MpPreference).ExclusionPath
+```
+
+Bootstrap offers to add exclusions itself via a UAC prompt. Accepting that is
+fine, but check afterwards that it did not add anything broader than the three
+paths above, and that it did not exclude a `C:` source location you are not
+using.
+
+If third-party antivirus is installed, exclude the same three paths there too.
+It is usually the larger offender.
 
 #### Step 6: first build
 
 ```bash
-cd /c/mozilla-source/firefox
+cd /d/dev/antumbra/firefox
 ./mach build
 ./mach run
 ```
@@ -208,17 +284,33 @@ cd /c/mozilla-source/firefox
 matters.** Budget a day or two for this the first time, most of it spent on
 toolchain problems rather than on the build itself.
 
-#### Realistic build times
+Capture the numbers while you have them, because they set every estimate that
+follows. `mach` prints its own elapsed time and the job count it chose:
 
-Highly dependent on core count. Wide ranges because they are honest ones.
+```bash
+./mach build 2>&1 | tee /d/dev/antumbra/build-log-first.txt
+grep -iE "real|elapsed|jobs|Your build was successful" /d/dev/antumbra/build-log-first.txt
+```
 
-| Build type | Time | When you use it |
-|---|---|---|
-| **Clean full build**, 8 cores | 60 to 120 minutes | First build, after a rebase, after a mozconfig change |
-| **Clean full build**, 16 cores | 30 to 60 minutes | Same |
-| **Incremental**, C++ change | 2 to 15 minutes | Editing Gecko. A widely included header touches everything and approaches a full rebuild. |
-| **`./mach build faster`** | Seconds to ~2 minutes | **Frontend only**: JS, CSS, XHTML, prefs, branding assets. This is most of Antumbra's milestone 1 work. |
-| **Artifact build** | 1 to 5 minutes | Frontend iteration only. See the warning below. |
+Record the result in the build times table below, replacing the expected values.
+
+#### Build times
+
+**Status: not yet measured.** The table below is what to expect on this machine
+(i7-11700, 8 cores / 16 threads, 64 GB, NVMe). Replace each expected value with
+the measured one after step 6, and note the job count `mach` actually used.
+
+| Build type | Expected | Measured | Job count | When you use it |
+|---|---|---|---|---|
+| **Clean full build** | 60 to 90 min | _not yet measured_ | _tbd_ | First build, after a rebase, after a mozconfig change |
+| **Incremental**, C++ change | 2 to 15 min | _not yet measured_ | _tbd_ | Editing Gecko. A widely included header touches everything and approaches a full rebuild. |
+| **`./mach build faster`** | Seconds to ~2 min | _not yet measured_ | _tbd_ | **Frontend only**: JS, CSS, XHTML, prefs, branding assets. Most of Antumbra's milestone 1 work. |
+| **Artifact build** | 1 to 5 min | _not yet measured_ | _tbd_ | Frontend iteration only. See the warning below. |
+
+Eight physical cores puts this machine at the slower end of the earlier 8-core
+estimate of 60 to 120 minutes, but NVMe and 64 GB of RAM pull it back toward the
+optimistic end, since neither IO nor memory will be the bottleneck. Treat 60 to
+90 minutes as the working assumption until measured.
 
 Two things that will save more time than any hardware upgrade:
 
@@ -248,28 +340,60 @@ claude
 A native Windows installer also exists; see the Claude Code docs at
 [code.claude.com/docs](https://code.claude.com/docs) for the current options.
 
-**The one integration detail that matters:** `mach` must run inside the
-MozillaBuild shell, not in PowerShell. Rather than rely on remembering that, add
-a wrapper to the repository so a single command works from anywhere:
+Run Claude Code from `D:\dev\antumbra\antumbra-browser`, the repository, not
+from the Firefox source tree.
 
-```bat
-:: scripts\mach.cmd
-@echo off
-C:\mozilla-build\start-shell.bat -c "cd /c/mozilla-source/firefox && ./mach %*"
+**The one integration detail that matters:** `mach` must run inside the
+MozillaBuild shell, not in PowerShell. `scripts\mach.cmd` in this repository
+handles that, so a single command works from any terminal:
+
+```
+scripts\mach.cmd build
+scripts\mach.cmd build faster
+scripts\mach.cmd run
 ```
 
-Then `scripts\mach.cmd build faster` works from a normal terminal, and Claude
-Code can drive builds without a shell-environment detour every time.
+It defaults to `C:\mozilla-build` and `D:\dev\antumbra`, sets
+`MOZBUILD_STATE_PATH` if it is not already set, translates the Windows path to
+the MSYS2 form the shell needs, and fails with a clear message if either the
+MozillaBuild install or the source tree is missing. Override with the
+`MOZILLABUILD` and `ANTUMBRA_ROOT` environment variables if the layout differs.
 
-### Remaining milestone 0 checklist
+### Milestone 0 checklist
 
-- [ ] Working `./mach run` on the Windows machine, per the steps above.
-- [ ] Defender exclusions verified, `sccache` configured, artifact-build mozconfig
-      kept separate from the release mozconfig.
-- [ ] Claude Code installed on the build machine, `scripts\mach.cmd` wrapper
-      working.
-- [ ] Pin `upstream.conf` to a specific Firefox ESR tag.
-- [ ] Create the repository skeleton from ARCHITECTURE.md section 9.2.
+**Status: not started on hardware.** The preparation below was done in a cloud
+session; everything requiring the build machine is untouched. Nothing here is
+complete until `./mach run` launches a browser.
+
+Prepared, not yet verified on hardware:
+
+- [x] `scripts/setup-windows.ps1`: validates the drive, creates the layout, sets
+      `MOZBUILD_STATE_PATH`, adds the three scoped Defender exclusions. Supports
+      `-DryRun`. **Written, never executed.**
+- [x] `scripts/mach.cmd`: MozillaBuild wrapper. **Written, never executed.**
+- [x] `.gitignore` covering `firefox/`, `.mozbuild/`, `obj-*/`.
+- [x] Build machine specifications and drive layout recorded above.
+
+Requires the build machine, in order:
+
+- [ ] Run `scripts\setup-windows.ps1 -DryRun` and **report D: free space.** Not
+      yet known; the roadmap cannot confirm the 150 GB recommendation is met.
+- [ ] Run `scripts\setup-windows.ps1` from an Administrator PowerShell.
+- [ ] Install Visual Studio Build Tools 2022 (step 2). GUI installer, may need a
+      reboot.
+- [ ] Install MozillaBuild to `C:\mozilla-build` (step 3). GUI installer.
+- [ ] Bootstrap and check out the pinned ESR tag (step 4). Accept the UAC prompt.
+- [ ] Verify Defender exclusions are exactly the three scoped paths (step 5).
+- [ ] First full build, `./mach run` confirmed working, **time and job count
+      recorded** in the table above (step 6).
+- [ ] `./mach build faster` timed and recorded.
+- [ ] Install Claude Code on the machine; confirm `scripts\mach.cmd` drives a
+      build from an ordinary terminal (step 7).
+- [ ] Configure `sccache` and keep the artifact-build mozconfig separate from the
+      release mozconfig.
+- [ ] Pin `upstream.conf` to a specific Firefox ESR tag. **Blocked:** the tag
+      cannot be chosen without checking which ESR is current at bootstrap time.
+- [ ] Create the rest of the repository skeleton from ARCHITECTURE.md section 9.2.
 - [ ] Write `THIRD-PARTY.md`, `SECURITY.md`, `CONTRIBUTING.md` (including the
       standing no-crypto, no-rewards, no-sponsored-content rule from spec section
       9).

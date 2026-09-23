@@ -306,6 +306,51 @@ of 2026-09-22. The tag is chosen from the repo at bootstrap time per D6.
 
 ---
 
+## 2026-09-23
+
+---
+
+### D9. GSD as the task workflow; DECISIONS.md remains the single decision record
+
+**Decision.** The project uses **GSD (get-shit-done-cc)** as its task-planning and execution
+workflow, scaffolded under `.planning/`. GSD plans break milestone checklist items into
+executable tasks and track execution state.
+
+DECISIONS.md remains the single authoritative decision record. GSD-generated files under
+`.planning/` are task management artifacts and do not override it. When a `.planning/` file
+and any of DECISIONS.md, ARCHITECTURE.md, or ROADMAP.md disagree, the root-level document
+is correct and the `.planning/` file is stale.
+
+**Operational rules:**
+
+1. Record decisions here (DECISIONS.md), not in `.planning/STATE.md` or plan summaries.
+   If a decision surfaces during phase execution, add it to this file.
+2. GSD plans under `.planning/phases/` scope tasks to what the authoritative ROADMAP.md
+   already specifies. They do not add or remove milestone scope.
+3. `.planning/STATE.md`, `.planning/todos/`, `.planning/debug/`, `.planning/spikes/`,
+   `.planning/sketches/`, and `.planning/quick/` are gitignored. They are working
+   state, not project record.
+4. `.planning/config.json`, `.planning/PROJECT.md`, `.planning/ROADMAP.md`, phase
+   PLAN.md files, and SUMMARY.md files are committed. They are part of the project
+   history.
+
+**Reasoning.**
+
+The project has detailed authoritative documentation already. Running `/gsd-new-project`
+would regenerate that documentation from scratch via questioning, producing competing
+copies. Bootstrapping `.planning/` manually with thin pointer files and going directly
+to `/gsd-plan-phase` preserves the existing docs as source of truth while gaining GSD's
+task-breakdown and execution tracking.
+
+The build machine constraint from D7 does not apply to local VS Code sessions, which have
+full access to `D:\dev\antumbra\firefox`. GSD phase plans must still state which build
+type verification requires (`./mach build faster` for frontend, full build for C++ or
+Rust), because build times differ by two orders of magnitude.
+
+**Affects:** `.planning/` directory (new), `.gitignore`.
+
+---
+
 ## Still open
 
 Carried forward from ARCHITECTURE.md section 13. Not yet decided.

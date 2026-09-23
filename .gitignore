@@ -13,6 +13,14 @@ upstream/
 *.mar
 dist/
 
+# GSD planning: ephemeral and personal files
+.planning/STATE.md
+.planning/todos/
+.planning/debug/
+.planning/spikes/
+.planning/sketches/
+.planning/quick/
+
 # Editor and OS noise
 .vscode/
 .idea/

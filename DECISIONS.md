@@ -280,6 +280,32 @@ work fine in the cloud. Compilation happens on the Windows machine.
 
 ---
 
+## 2026-09-22 (milestone 0 hardware run)
+
+---
+
+### D8. Pin to Firefox ESR 153, tag FIREFOX_153_3_0esr_RELEASE
+
+**Decision.** The initial upstream pin is `FIREFOX_153_3_0esr_RELEASE`
+(Firefox 153.3.0esr), recorded in `upstream.conf`.
+
+**Reasoning.**
+
+Three ESR generations were available at bootstrap time: ESR 128, ESR 140,
+and ESR 153. ESR 128 is end-of-life. ESR 140 is ending in approximately
+October 2026, which would force an immediate major rebase. ESR 153 is the
+current active generation, released mid-2026, with a support window running
+through approximately late 2027. Pinning to it gives the longest runway before
+the next annual rebase and uses the most recent privacy and security work
+from upstream.
+
+The specific point release (153.3.0) is the latest available RELEASE tag as
+of 2026-09-22. The tag is chosen from the repo at bootstrap time per D6.
+
+**Affects:** `upstream.conf`, ROADMAP.md milestone 0 checklist.
+
+---
+
 ## Still open
 
 Carried forward from ARCHITECTURE.md section 13. Not yet decided.

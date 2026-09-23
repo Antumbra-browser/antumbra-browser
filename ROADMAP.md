@@ -224,6 +224,40 @@ nasm, Node). It will raise a **UAC prompt for PowerShell: answer Yes.** That ste
 adds the Microsoft Defender exclusions described below automatically, and
 skipping it costs a large amount of build time for no benefit.
 
+**Real-hardware note (2026-09-22).** Running `bootstrap.py` directly as written
+above crashed after a successful clone on this machine. Two issues were found:
+
+1. **MOZBUILD_STATE_PATH not visible in the MozillaBuild shell.** Even though the
+   variable was set as a user environment variable by `setup-windows.ps1`, the
+   MozillaBuild shell did not inherit it. Bootstrap fell back to
+   `C:\Users\Travis\.mozbuild`. Fix: `export MOZBUILD_STATE_PATH=/d/dev/antumbra/.mozbuild`
+   at the top of every MozillaBuild session, or add it to
+   `C:\mozilla-build\start-shell.bat`. The `scripts\mach.cmd` wrapper already
+   sets it as a fallback.
+
+2. **git safe.directory ownership error.** After the clone, subsequent `git`
+   operations fail with `detected dubious ownership` because the clone ran in an
+   elevated context (bootstrap raised a UAC prompt) which caused the repository
+   directory to be owned by `BUILTIN/Administrators` rather than the current user.
+   Fix (run once in the MozillaBuild shell):
+   ```bash
+   git config --global --add safe.directory D:/dev/antumbra/firefox
+   ```
+
+**Revised procedure.** If `bootstrap.py` fails after cloning, do not re-run it.
+Instead, fix the ownership issue above, then install toolchains directly:
+
+```bash
+export MOZBUILD_STATE_PATH=/d/dev/antumbra/.mozbuild
+cd /d/dev/antumbra/firefox
+git config --global --add safe.directory D:/dev/antumbra/firefox
+git checkout main
+./mach bootstrap --application-choice browser
+```
+
+`mach bootstrap` skips the clone and goes straight to toolchain installation,
+which is all that remains after the clone succeeds.
+
 Then pin to ESR per D6, rather than tracking `main`:
 
 ```bash
@@ -231,6 +265,41 @@ cd firefox
 git fetch --tags
 git checkout <FIREFOX_ESR_TAG>     # recorded in upstream.conf
 ```
+
+**Real-hardware note (2026-09-23).** Two additional issues hit when re-running
+`./mach bootstrap --application-choice browser` from the pinned ESR tree after
+checking it out:
+
+3. **`check_agentic_tools()` fails in MozillaBuild.** The bootstrap tries to
+   install `cargo-binstall` via system cargo, which fails because the Windows SDK
+   `LIB` path is not set in the MozillaBuild shell environment (LNK1181:
+   cannot open `kernel32.lib`). This step only installs AI developer tooling and
+   is not needed for building. Fix: comment out the call at line 461 of
+   `python/mozboot/mozboot/bootstrap.py`:
+   ```python
+   # self.check_agentic_tools()
+   ```
+   This is a one-time patch to the ESR 153 source tree.
+
+4. **VS toolchain version mismatch after re-bootstrap.** If bootstrap is run more
+   than once (e.g., once from `main` to clone, then again from the ESR tree), the
+   bundled VS toolchain in `.mozbuild/vs` may be replaced with a different MSVC
+   version. The `config.status` file in the build object directory then references
+   the old version, causing `INCLUDE` to point to a non-existent path. Cargo
+   builds of C++ crates (notably `swgl`, which compiles `gl.cc`) fail with
+   `fatal error: 'stdlib.h' file not found`. Fix: re-run configure after any
+   bootstrap that changes the VS toolchain version:
+   ```bash
+   ./mach configure
+   ```
+   Then resume `./mach build` as normal. The configure step detects the installed
+   VS version and regenerates `config.status` with the correct paths.
+
+**The toolchain used is clang 21.1.8**, not clang 22 as originally assumed. Both
+the main-branch and ESR 153 bootstrap resolve to the same cached clang artifact
+(`lib/clang/21/`). The `-Wno-error=incompatible-pointer-types` flag in `mozconfig`
+is required because clang 21.1.8 treats the pointer type mismatches in ESR 153's
+bundled NSPR as hard errors in C mode.
 
 #### Step 5: Windows Defender exclusions
 
@@ -272,6 +341,13 @@ using.
 If third-party antivirus is installed, exclude the same three paths there too.
 It is usually the larger offender.
 
+**If `Add-MpPreference` fails with error 0x800106ba**, a third-party antivirus
+product is the active provider and has taken over the Windows Security service.
+`Add-MpPreference` is not available in that state. Add the three paths as
+exclusions in the third-party product's own settings instead. On this machine the
+active provider is Surfshark Antivirus. Exclusions are a build-speed optimization,
+not a build requirement, and this error does not block the build.
+
 #### Step 6: first build
 
 ```bash
@@ -296,16 +372,17 @@ Record the result in the build times table below, replacing the expected values.
 
 #### Build times
 
-**Status: not yet measured.** The table below is what to expect on this machine
-(i7-11700, 8 cores / 16 threads, 64 GB, NVMe). Replace each expected value with
-the measured one after step 6, and note the job count `mach` actually used.
-
 | Build type | Expected | Measured | Job count | When you use it |
 |---|---|---|---|---|
-| **Clean full build** | 60 to 90 min | _not yet measured_ | _tbd_ | First build, after a rebase, after a mozconfig change |
-| **Incremental**, C++ change | 2 to 15 min | _not yet measured_ | _tbd_ | Editing Gecko. A widely included header touches everything and approaches a full rebuild. |
-| **`./mach build faster`** | Seconds to ~2 min | _not yet measured_ | _tbd_ | **Frontend only**: JS, CSS, XHTML, prefs, branding assets. Most of Antumbra's milestone 1 work. |
-| **Artifact build** | 1 to 5 min | _not yet measured_ | _tbd_ | Frontend iteration only. See the warning below. |
+| **Clean full build** | 60 to 90 min | 46m54s (2026-09-23) | 16 (default) | First build, after a rebase, after a mozconfig change |
+| **Incremental**, C++ change | 2 to 15 min | _not yet measured_ | 16 | Editing Gecko. A widely included header touches everything and approaches a full rebuild. |
+| **`./mach build faster`** | Seconds to ~2 min | 8s (2026-09-23) | n/a | **Frontend only**: JS, CSS, XHTML, prefs, branding assets. Most of Antumbra's milestone 1 work. |
+| **Artifact build** | 1 to 5 min | _not yet measured_ | n/a | Frontend iteration only. See the warning below. |
+
+**Note on the full build measurement.** The 46m54s figure was taken with partial
+sccache cache from prior failed build attempts. A true cold build from a clean
+object directory is expected to run 60 to 90 minutes. The number serves as a
+confirmed upper bound, not a cold-build baseline.
 
 Eight physical cores puts this machine at the slower end of the earlier 8-core
 estimate of 60 to 120 minutes, but NVMe and 64 GB of RAM pull it back toward the
@@ -369,30 +446,41 @@ Prepared, not yet verified on hardware:
 
 - [x] `scripts/setup-windows.ps1`: validates the drive, creates the layout, sets
       `MOZBUILD_STATE_PATH`, adds the three scoped Defender exclusions. Supports
-      `-DryRun`. **Written, never executed.**
-- [x] `scripts/mach.cmd`: MozillaBuild wrapper. **Written, never executed.**
+      `-DryRun`. Executed and verified 2026-09-22.
+- [x] `scripts/mach.cmd`: MozillaBuild wrapper. Written; not yet exercised for a build.
 - [x] `.gitignore` covering `firefox/`, `.mozbuild/`, `obj-*/`.
 - [x] Build machine specifications and drive layout recorded above.
 
 Requires the build machine, in order:
 
-- [ ] Run `scripts\setup-windows.ps1 -DryRun` and **report D: free space.** Not
-      yet known; the roadmap cannot confirm the 150 GB recommendation is met.
-- [ ] Run `scripts\setup-windows.ps1` from an Administrator PowerShell.
-- [ ] Install Visual Studio Build Tools 2022 (step 2). GUI installer, may need a
-      reboot.
-- [ ] Install MozillaBuild to `C:\mozilla-build` (step 3). GUI installer.
-- [ ] Bootstrap and check out the pinned ESR tag (step 4). Accept the UAC prompt.
-- [ ] Verify Defender exclusions are exactly the three scoped paths (step 5).
-- [ ] First full build, `./mach run` confirmed working, **time and job count
-      recorded** in the table above (step 6).
-- [ ] `./mach build faster` timed and recorded.
+- [x] Run `scripts\setup-windows.ps1 -DryRun` and **report D: free space.**
+      506.9 GB free of 931.5 GB. Confirmed well above the 150 GB recommendation.
+- [x] Run `scripts\setup-windows.ps1` from an Administrator PowerShell.
+      Directories and `MOZBUILD_STATE_PATH` set. Defender exclusions skipped
+      (Surfshark is the active AV provider; see step 5 note).
+- [x] Install Visual Studio Build Tools 2022 (step 2). **Not required as a
+      separate install.** `mach bootstrap` downloaded `DIA SDK`, `VC`, and
+      `Windows Kits` (the full Windows SDK) into `.mozbuild\vs`. The build
+      system uses these directly. No GUI installer or reboot needed.
+- [x] Install MozillaBuild to `C:\mozilla-build` (step 3). Version 4.2.1 installed.
+- [x] Bootstrap and check out the pinned ESR tag (step 4). See real-hardware notes
+      above. Tree cloned, toolchains installed, sccache enabled.
+      Checked out `FIREFOX_153_3_0esr_RELEASE`. Applied one-time patch to
+      `python/mozboot/mozboot/bootstrap.py` to skip `check_agentic_tools()`.
+      Ran `./mach configure` after second bootstrap to fix VS 14.51/14.50 mismatch.
+- [x] Verify Defender exclusions are exactly the three scoped paths (step 5).
+      Windows Defender not applicable (Surfshark is active AV). Three paths added
+      manually in Surfshark settings.
+- [x] First full build, `./mach run` confirmed working, **time and job count
+      recorded** in the table above (step 6). Full build: 46m54s at j16.
+      `./mach run` launched browser confirmed 2026-09-23.
+- [x] `./mach build faster` timed and recorded. 8s (2026-09-23).
 - [ ] Install Claude Code on the machine; confirm `scripts\mach.cmd` drives a
       build from an ordinary terminal (step 7).
-- [ ] Configure `sccache` and keep the artifact-build mozconfig separate from the
-      release mozconfig.
-- [ ] Pin `upstream.conf` to a specific Firefox ESR tag. **Blocked:** the tag
-      cannot be chosen without checking which ESR is current at bootstrap time.
+- [x] Configure `sccache`. Enabled during bootstrap. Keep the artifact-build
+      mozconfig separate from the release mozconfig (not yet created).
+- [x] Pin `upstream.conf` to a specific Firefox ESR tag. Pinned to
+      `FIREFOX_153_3_0esr_RELEASE` (ESR 153, latest as of 2026-09-22). See D8.
 - [ ] Create the rest of the repository skeleton from ARCHITECTURE.md section 9.2.
 - [ ] Write `THIRD-PARTY.md`, `SECURITY.md`, `CONTRIBUTING.md` (including the
       standing no-crypto, no-rewards, no-sponsored-content rule from spec section

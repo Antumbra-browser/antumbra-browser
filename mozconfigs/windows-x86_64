@@ -1,0 +1,30 @@
+# Antumbra mozconfig -- Windows x86_64
+# Upstream pin: FIREFOX_153_3_0esr_RELEASE (D8)
+# Build platform: Windows first (D7)
+
+# Branding: use Antumbra, never --enable-official-branding (ARCHITECTURE.md 11.3)
+ac_add_options --with-branding=browser/branding/antumbra
+
+# Optimization: release profile
+ac_add_options --enable-optimize
+ac_add_options --disable-debug
+
+# Telemetry compiled out (ARCHITECTURE.md 5.8)
+ac_add_options --disable-crashreporter
+ac_add_options --disable-parental-controls
+ac_add_options --disable-default-browser-agent
+export MOZ_TELEMETRY_REPORTING=0
+export MOZ_DATA_REPORTING=0
+export MOZ_SERVICES_HEALTHREPORT=0
+export MOZ_NORMANDY=0
+export MOZ_CRASHREPORTER=0
+export MOZ_TELEMETRY_ON_BY_DEFAULT=0
+
+# Extension signing: stays on (D3 -- no MOZ_REQUIRE_SIGNING=0)
+
+# Application identity
+export MOZ_APP_NAME=antumbra
+export MOZ_DISTRIBUTION_ID=com.antumbra
+
+# Windows-specific: output directory
+mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/obj-x86_64-pc-mingw32

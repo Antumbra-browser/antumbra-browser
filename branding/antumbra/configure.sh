@@ -1,0 +1,2 @@
+MOZ_APP_DISPLAYNAME=Antumbra
+MOZ_MACBUNDLE_ID=com.antumbra.browser

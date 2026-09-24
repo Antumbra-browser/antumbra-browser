@@ -1,0 +1,22 @@
+{
+  "policies": {
+    "ExtensionSettings": {
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "normal_installed"
+      },
+      "Consent-O-Matic@cavi.au.dk": {
+        "installation_mode": "normal_installed"
+      },
+      "@testpilot-containers": {
+        "installation_mode": "normal_installed"
+      }
+    },
+    "DisableSystemAddonUpdate": true,
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "OverrideFirstRunPage": "",
+    "DisableFeedbackCommands": true,
+    "DisableSetDesktopBackground": false,
+    "DontCheckDefaultBrowser": true
+  }
+}

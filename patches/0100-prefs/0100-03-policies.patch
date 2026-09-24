@@ -1,0 +1,28 @@
+diff --git a/browser/distribution/policies.json b/browser/distribution/policies.json
+new file mode 100644
+index 000000000000..f2f584c254b2
+--- /dev/null
++++ b/browser/distribution/policies.json
+@@ -0,0 +1,22 @@
++{
++  "policies": {
++    "ExtensionSettings": {
++      "uBlock0@raymondhill.net": {
++        "installation_mode": "normal_installed"
++      },
++      "gdpr@cavi.au.dk": {
++        "installation_mode": "normal_installed"
++      },
++      "@testpilot-containers": {
++        "installation_mode": "normal_installed"
++      }
++    },
++    "DisableSystemAddonUpdate": true,
++    "DisableTelemetry": true,
++    "DisableFirefoxStudies": true,
++    "OverrideFirstRunPage": "",
++    "DisableFeedbackCommands": true,
++    "DisableSetDesktopBackground": false,
++    "DontCheckDefaultBrowser": true
++  }
++}

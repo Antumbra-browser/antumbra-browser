@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to Antumbra</title>
+  <link rel="stylesheet" href="chrome://antumbra/content/welcome.css">
+</head>
+<body>
+<div class="wizard">
+
+  <!-- Screen 1: Protection mode picker -->
+  <div class="screen active" id="screen-mode">
+    <div class="logo">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="30" fill="none" stroke="#FFB020" stroke-width="5" opacity="0.9"/>
+        <circle cx="32" cy="32" r="20" fill="#0B0D10"/>
+      </svg>
+    </div>
+    <h1>Welcome to Antumbra</h1>
+    <p class="subtitle">Choose your protection level. You can change this any time.</p>
+    <div class="mode-cards">
+      <div class="mode-card selected" data-mode="standard" tabindex="0">
+        <div class="name">Standard</div>
+        <div class="desc">Strict tracking protection, ad blocking, cookie banner rejection. Works with nearly every site.</div>
+        <div class="tradeoff">Good for everyday browsing.</div>
+      </div>
+      <div class="mode-card" data-mode="strict" tabindex="0">
+        <div class="name">Strict</div>
+        <div class="desc">Everything in Standard, plus fingerprinting protection and aggressive parameter stripping. Occasionally breaks logins on complex sites.</div>
+        <div class="tradeoff">Better privacy, some site breakage possible.</div>
+      </div>
+      <div class="mode-card" data-mode="blackout" tabindex="0">
+        <div class="name">Blackout</div>
+        <div class="desc">Maximum hardening. Resist Fingerprinting on, WebRTC restricted, pure-black chrome. Breaks more sites intentionally.</div>
+        <div class="tradeoff">Highest privacy, highest breakage. Use per-site relaxation when needed.</div>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="step-dots">
+        <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <button class="btn btn-primary" id="mode-next">Next</button>
+    </div>
+  </div>
+
+  <!-- Screen 2: DNS resolver picker -->
+  <div class="screen" id="screen-dns">
+    <h1>Encrypted DNS</h1>
+    <p class="subtitle">Antumbra encrypts DNS queries so your internet provider cannot see what sites you visit by name. Choose a resolver.</p>
+    <div class="resolver-list" id="resolver-list"><!-- populated by JS --></div>
+    <div id="custom-url-row" style="display:none">
+      <input type="url" id="custom-url" placeholder="https://your-resolver/dns-query">
+    </div>
+    <div class="actions">
+      <div class="step-dots">
+        <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" id="dns-back">Back</button>
+        <button class="btn btn-primary" id="dns-next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 3: Tab orientation -->
+  <div class="screen" id="screen-tabs">
+    <h1>Tab layout</h1>
+    <p class="subtitle">Where would you like your tabs?</p>
+    <div class="tab-options">
+      <div class="tab-option selected" data-tabs="vertical" tabindex="0">
+        <div class="icon">&#9707;</div>
+        <div class="label">Vertical (left sidebar)</div>
+      </div>
+      <div class="tab-option" data-tabs="horizontal" tabindex="0">
+        <div class="icon">&#9636;</div>
+        <div class="label">Horizontal (top bar)</div>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="step-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" id="tabs-back">Back</button>
+        <button class="btn btn-primary" id="tabs-next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 4: Primary password offer -->
+  <div class="screen" id="screen-password">
+    <h1>Password vault</h1>
+    <p class="subtitle">Antumbra includes a built-in password manager.</p>
+    <div class="pw-box">
+      <p><strong>Set a primary password</strong> to encrypt your saved passwords with a key only you know.</p>
+      <p style="margin-top:8px">Without one, your saved passwords are encrypted with a key stored next to them. Anyone with access to your profile can read them.</p>
+    </div>
+    <p style="font-size:0.85rem;color:var(--ash);margin-bottom:20px">You can set a primary password later in Settings &rsaquo; Privacy &amp; Security &rsaquo; Passwords.</p>
+    <div class="actions">
+      <div class="step-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" id="pw-back">Back</button>
+        <button class="btn btn-primary" id="pw-next">Got it, continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 5: Update method + network disclosures -->
+  <div class="screen" id="screen-updates">
+    <h1>How updates work</h1>
+    <p class="subtitle">Antumbra does not yet have a built-in updater. Updates are delivered through your package manager or as direct downloads from GitHub Releases.</p>
+    <div class="disclosure-box">
+      <p><strong>Two background connections you should know about:</strong></p>
+      <p><strong>Remote Settings</strong> (Mozilla): periodically downloads certificate revocation data, tracking protection lists, and cookie banner rejection rules. No data is uploaded. Required for security and for cookie banner blocking to work.</p>
+      <p><strong>Safe Browsing</strong> (Google): local malware and phishing lists are checked against your visits. The per-download remote lookup that sends URLs to Google is disabled. Only local list checks run.</p>
+      <p>Both are disclosed in the privacy policy. Neither is telemetry.</p>
+    </div>
+    <div class="actions">
+      <div class="step-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" id="updates-back">Back</button>
+        <button class="btn btn-primary" id="updates-finish">Start browsing</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="chrome://antumbra/content/welcome.js"></script>
+</body>
+</html>

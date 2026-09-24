@@ -1,0 +1,59 @@
+{
+  "_comment": "Antumbra DNS resolver list. Shown in the first-run wizard. Not Mozilla's TRR partner list. Edit requires DECISIONS.md note on reasoning (ARCHITECTURE.md 5.7).",
+  "resolvers": [
+    {
+      "id": "quad9",
+      "name": "Quad9",
+      "url": "https://dns.quad9.net/dns-query",
+      "description": "Non-profit. Switzerland. No logging of source IPs. Blocks known malware domains.",
+      "jurisdiction": "Switzerland",
+      "logs": false,
+      "default": true
+    },
+    {
+      "id": "mullvad",
+      "name": "Mullvad",
+      "url": "https://doh.mullvad.net/dns-query",
+      "description": "Privacy-focused VPN provider. Sweden. No-log policy. No malware filtering.",
+      "jurisdiction": "Sweden",
+      "logs": false,
+      "default": false
+    },
+    {
+      "id": "adguard",
+      "name": "AdGuard",
+      "url": "https://dns.adguard-dns.com/dns-query",
+      "description": "Independent. Cyprus. No logging. Blocks ads and trackers at the DNS level.",
+      "jurisdiction": "Cyprus",
+      "logs": false,
+      "default": false
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare 1.1.1.1",
+      "url": "https://cloudflare-dns.com/dns-query",
+      "description": "US-based. Largest CDN provider. Logs anonymised queries for 24 hours per privacy policy.",
+      "jurisdiction": "United States",
+      "logs": true,
+      "default": false
+    },
+    {
+      "id": "system",
+      "name": "Use my system resolver",
+      "url": "",
+      "description": "Uses your network's default DNS. Right choice if you trust your ISP, run Pi-hole, or use a VPN with its own DNS.",
+      "jurisdiction": "varies",
+      "logs": null,
+      "default": false
+    },
+    {
+      "id": "custom",
+      "name": "Custom URL",
+      "url": "",
+      "description": "Enter a DNS-over-HTTPS URL. For people who run their own resolver.",
+      "jurisdiction": "custom",
+      "logs": null,
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,245 @@
+diff --git a/browser/app/profile/modes/blackout.js b/browser/app/profile/modes/blackout.js
+new file mode 100644
+index 000000000000..e72c83fa22fa
+--- /dev/null
++++ b/browser/app/profile/modes/blackout.js
+@@ -0,0 +1,32 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++/* Antumbra Blackout mode pref delta (ARCHITECTURE.md section 4).
++ * Applied by AntumbraMode.sys.mjs when antumbra.protection.mode = "blackout".
++ * Chrome accent: pure #000000, no accent color (BRANDING.md section 6).
++ */
++
++// ETP strict.
++pref("browser.contentblocking.category", "strict");
++
++// RFP on in Blackout (user has accepted breakage; this is the Tor Browser approach).
++// Provides letterboxing, timezone spoofing, canvas noise. See ARCHITECTURE.md 5.3.
++pref("privacy.resistFingerprinting", true);
++pref("privacy.fingerprintingProtection", true);
++pref("privacy.fingerprintingProtection.pbmode", true);
++
++// WebRTC: restrict in Blackout. Disable host candidates; TURN-only via proxy if set.
++pref("media.peerconnection.ice.default_address_only", true);
++pref("media.peerconnection.ice.no_host", true);
++pref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
++
++// FPI off globally (D1); only Totality window enables it per-context.
++pref("privacy.firstparty.isolate", false);
++
++// DNS: mode 2 by default; mode 3 offered in UI with a warning (breaks captive portals).
++pref("network.trr.mode", 2);
++
++// Query stripping: enabled (same as Strict; maximum lists selected via uBO).
++pref("privacy.query_stripping.enabled", true);
++pref("privacy.query_stripping.enabled.pbmode", true);
+diff --git a/browser/app/profile/modes/standard.js b/browser/app/profile/modes/standard.js
+new file mode 100644
+index 000000000000..d532d01e98aa
+--- /dev/null
++++ b/browser/app/profile/modes/standard.js
+@@ -0,0 +1,33 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++/* Antumbra Standard mode pref delta (ARCHITECTURE.md section 4).
++ * Applied by AntumbraMode.sys.mjs when antumbra.protection.mode = "standard".
++ * These prefs extend the baseline in antumbra.js; they are NOT the full pref set.
++ * Chrome accent: --ash (#8B95A3). Dark disc, thin ash ring (BRANDING.md section 6).
++ */
++
++// ETP strict (baseline also sets this; explicit here for mode clarity).
++pref("browser.contentblocking.category", "strict");
++
++// FPP on, RFP off in Standard (RFP reserved for Blackout/Totality per ARCHITECTURE.md 5.3).
++pref("privacy.fingerprintingProtection", true);
++pref("privacy.fingerprintingProtection.pbmode", true);
++pref("privacy.resistFingerprinting", false);
++pref("privacy.resistFingerprinting.letterboxing", false);
++
++// WebRTC: block local address enumeration, keep WebRTC functional.
++pref("media.peerconnection.ice.default_address_only", true);
++pref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
++pref("media.peerconnection.enabled", true);
++
++// FPI off in Standard (D1: TCP covers this use case).
++pref("privacy.firstparty.isolate", false);
++
++// DNS: TRR mode 2, not mode 3 (captive portal compatibility per ARCHITECTURE.md 5.7).
++pref("network.trr.mode", 2);
++
++// Query stripping: baseline strip list.
++pref("privacy.query_stripping.enabled", true);
++pref("privacy.query_stripping.enabled.pbmode", true);
+diff --git a/browser/app/profile/modes/strict.js b/browser/app/profile/modes/strict.js
+new file mode 100644
+index 000000000000..eca11b78d8f2
+--- /dev/null
++++ b/browser/app/profile/modes/strict.js
+@@ -0,0 +1,31 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++/* Antumbra Strict mode pref delta (ARCHITECTURE.md section 4).
++ * Applied by AntumbraMode.sys.mjs when antumbra.protection.mode = "strict".
++ * Chrome accent: --corona (#FFB020). Dark disc, full corona ring with glow (BRANDING.md section 6).
++ */
++
++// ETP strict (same as Standard).
++pref("browser.contentblocking.category", "strict");
++
++// FPP on, RFP still off (site breakage too high for default; user-togglable per ARCHITECTURE.md 5.3).
++pref("privacy.fingerprintingProtection", true);
++pref("privacy.fingerprintingProtection.pbmode", true);
++pref("privacy.resistFingerprinting", false);
++
++// WebRTC: same as Standard (no_host breaks local video calls; wrong default for non-technical users).
++pref("media.peerconnection.ice.default_address_only", true);
++pref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
++pref("media.peerconnection.enabled", true);
++
++// FPI off in Strict (D1: TCP covers this; FPI causes SSO breakage).
++pref("privacy.firstparty.isolate", false);
++
++// DNS: TRR mode 2 (same as Standard).
++pref("network.trr.mode", 2);
++
++// Query stripping: aggressive (Strict adds regional and extra privacy lists via uBO).
++pref("privacy.query_stripping.enabled", true);
++pref("privacy.query_stripping.enabled.pbmode", true);
+diff --git a/browser/components/antumbra/AntumbraMode.sys.mjs b/browser/components/antumbra/AntumbraMode.sys.mjs
+new file mode 100644
+index 000000000000..7a3d12b465a3
+--- /dev/null
++++ b/browser/components/antumbra/AntumbraMode.sys.mjs
+@@ -0,0 +1,125 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++/**
++ * AntumbraMode: reads antumbra.protection.mode and applies per-mode prefs
++ * and chrome accent color. Called at startup by BrowserGlue and by the
++ * first-run wizard when the user picks a mode.
++ *
++ * Modes: "standard" | "strict" | "blackout"  (ARCHITECTURE.md section 4)
++ * Accent tokens per mode:
++ *   standard -> --ash  #8B95A3
++ *   strict   -> --corona  #FFB020
++ *   blackout -> #000000 (no accent)
++ */
++
++const lazy = {};
++ChromeUtils.defineESModuleGetters(lazy, {
++  Services: "resource://gre/modules/Services.sys.mjs",
++});
++
++const PREF_MODE = "antumbra.protection.mode";
++const VALID_MODES = ["standard", "strict", "blackout"];
++
++// Per-mode pref deltas. Keep in sync with prefs/modes/*.js.
++// Only prefs that differ between modes are listed; the antumbra.js baseline
++// sets everything else.
++const MODE_PREFS = {
++  standard: {
++    "privacy.resistFingerprinting": false,
++    "privacy.resistFingerprinting.letterboxing": false,
++    "media.peerconnection.enabled": true,
++    "media.peerconnection.ice.no_host": false,
++    "network.trr.mode": 2,
++  },
++  strict: {
++    "privacy.resistFingerprinting": false,
++    "privacy.resistFingerprinting.letterboxing": false,
++    "media.peerconnection.enabled": true,
++    "media.peerconnection.ice.no_host": false,
++    "network.trr.mode": 2,
++  },
++  blackout: {
++    "privacy.resistFingerprinting": true,
++    "media.peerconnection.ice.no_host": true,
++    "network.trr.mode": 2,
++  },
++};
++
++// Accent color per mode, applied to --antumbra-accent CSS custom property
++// on the root element of each chrome window (BRANDING.md section 6).
++const MODE_ACCENT = {
++  standard: "#8B95A3",   // --ash
++  strict:   "#FFB020",   // --corona
++  blackout: "#000000",   // no accent; toolbar is pure black
++};
++
++export const AntumbraMode = {
++  /**
++   * Apply the currently configured mode. Safe to call multiple times.
++   * Called by BrowserGlue at startup and by the first-run wizard on mode pick.
++   */
++  applyCurrentMode() {
++    const mode = this.getCurrentMode();
++    this._applyPrefs(mode);
++    this._applyAccent(mode);
++    return mode;
++  },
++
++  /**
++   * Set a new mode, persist it, and apply immediately.
++   * @param {string} mode  One of "standard", "strict", "blackout".
++   */
++  applyMode(mode) {
++    if (!VALID_MODES.includes(mode)) {
++      throw new Error(`AntumbraMode: unknown mode "${mode}"`);
++    }
++    Services.prefs.setCharPref(PREF_MODE, mode);
++    this._applyPrefs(mode);
++    this._applyAccent(mode);
++    return mode;
++  },
++
++  getCurrentMode() {
++    try {
++      const m = Services.prefs.getCharPref(PREF_MODE, "standard");
++      return VALID_MODES.includes(m) ? m : "standard";
++    } catch {
++      return "standard";
++    }
++  },
++
++  _applyPrefs(mode) {
++    const prefs = MODE_PREFS[mode] ?? MODE_PREFS.standard;
++    for (const [key, value] of Object.entries(prefs)) {
++      try {
++        if (typeof value === "boolean") {
++          Services.prefs.setBoolPref(key, value);
++        } else if (typeof value === "number") {
++          Services.prefs.setIntPref(key, value);
++        } else {
++          Services.prefs.setCharPref(key, value);
++        }
++      } catch (e) {
++        console.error(`AntumbraMode: failed to set ${key}=${value}:`, e);
++      }
++    }
++  },
++
++  _applyAccent(mode) {
++    const color = MODE_ACCENT[mode] ?? MODE_ACCENT.standard;
++    // Set a CSS custom property on every open chrome window.
++    for (const win of Services.wm.getEnumerator("navigator:browser")) {
++      try {
++        win.document.documentElement.style.setProperty(
++          "--antumbra-accent",
++          color
++        );
++        win.document.documentElement.setAttribute("antumbra-mode", mode);
++      } catch {
++        // Window may be in the process of closing; safe to ignore.
++      }
++    }
++  },
++};

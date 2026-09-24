@@ -1,0 +1,125 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/**
+ * AntumbraMode: reads antumbra.protection.mode and applies per-mode prefs
+ * and chrome accent color. Called at startup by BrowserGlue and by the
+ * first-run wizard when the user picks a mode.
+ *
+ * Modes: "standard" | "strict" | "blackout"  (ARCHITECTURE.md section 4)
+ * Accent tokens per mode:
+ *   standard -> --ash  #8B95A3
+ *   strict   -> --corona  #FFB020
+ *   blackout -> #000000 (no accent)
+ */
+
+const lazy = {};
+ChromeUtils.defineESModuleGetters(lazy, {
+  Services: "resource://gre/modules/Services.sys.mjs",
+});
+
+const PREF_MODE = "antumbra.protection.mode";
+const VALID_MODES = ["standard", "strict", "blackout"];
+
+// Per-mode pref deltas. Keep in sync with prefs/modes/*.js.
+// Only prefs that differ between modes are listed; the antumbra.js baseline
+// sets everything else.
+const MODE_PREFS = {
+  standard: {
+    "privacy.resistFingerprinting": false,
+    "privacy.resistFingerprinting.letterboxing": false,
+    "media.peerconnection.enabled": true,
+    "media.peerconnection.ice.no_host": false,
+    "network.trr.mode": 2,
+  },
+  strict: {
+    "privacy.resistFingerprinting": false,
+    "privacy.resistFingerprinting.letterboxing": false,
+    "media.peerconnection.enabled": true,
+    "media.peerconnection.ice.no_host": false,
+    "network.trr.mode": 2,
+  },
+  blackout: {
+    "privacy.resistFingerprinting": true,
+    "media.peerconnection.ice.no_host": true,
+    "network.trr.mode": 2,
+  },
+};
+
+// Accent color per mode, applied to --antumbra-accent CSS custom property
+// on the root element of each chrome window (BRANDING.md section 6).
+const MODE_ACCENT = {
+  standard: "#8B95A3",   // --ash
+  strict:   "#FFB020",   // --corona
+  blackout: "#000000",   // no accent; toolbar is pure black
+};
+
+export const AntumbraMode = {
+  /**
+   * Apply the currently configured mode. Safe to call multiple times.
+   * Called by BrowserGlue at startup and by the first-run wizard on mode pick.
+   */
+  applyCurrentMode() {
+    const mode = this.getCurrentMode();
+    this._applyPrefs(mode);
+    this._applyAccent(mode);
+    return mode;
+  },
+
+  /**
+   * Set a new mode, persist it, and apply immediately.
+   * @param {string} mode  One of "standard", "strict", "blackout".
+   */
+  applyMode(mode) {
+    if (!VALID_MODES.includes(mode)) {
+      throw new Error(`AntumbraMode: unknown mode "${mode}"`);
+    }
+    Services.prefs.setCharPref(PREF_MODE, mode);
+    this._applyPrefs(mode);
+    this._applyAccent(mode);
+    return mode;
+  },
+
+  getCurrentMode() {
+    try {
+      const m = Services.prefs.getCharPref(PREF_MODE, "standard");
+      return VALID_MODES.includes(m) ? m : "standard";
+    } catch {
+      return "standard";
+    }
+  },
+
+  _applyPrefs(mode) {
+    const prefs = MODE_PREFS[mode] ?? MODE_PREFS.standard;
+    for (const [key, value] of Object.entries(prefs)) {
+      try {
+        if (typeof value === "boolean") {
+          Services.prefs.setBoolPref(key, value);
+        } else if (typeof value === "number") {
+          Services.prefs.setIntPref(key, value);
+        } else {
+          Services.prefs.setCharPref(key, value);
+        }
+      } catch (e) {
+        console.error(`AntumbraMode: failed to set ${key}=${value}:`, e);
+      }
+    }
+  },
+
+  _applyAccent(mode) {
+    const color = MODE_ACCENT[mode] ?? MODE_ACCENT.standard;
+    // Set a CSS custom property on every open chrome window.
+    for (const win of Services.wm.getEnumerator("navigator:browser")) {
+      try {
+        win.document.documentElement.style.setProperty(
+          "--antumbra-accent",
+          color
+        );
+        win.document.documentElement.setAttribute("antumbra-mode", mode);
+      } catch {
+        // Window may be in the process of closing; safe to ignore.
+      }
+    }
+  },
+};

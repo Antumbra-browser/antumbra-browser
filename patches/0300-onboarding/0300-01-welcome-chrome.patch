@@ -1,0 +1,535 @@
+diff --git a/browser/branding/antumbra/content/antumbra-content/dns-resolvers.json b/browser/branding/antumbra/content/antumbra-content/dns-resolvers.json
+new file mode 100644
+index 000000000000..069ab0fd7df5
+--- /dev/null
++++ b/browser/branding/antumbra/content/antumbra-content/dns-resolvers.json
+@@ -0,0 +1,59 @@
++{
++  "_comment": "Antumbra DNS resolver list. Shown in the first-run wizard. Not Mozilla's TRR partner list. Edit requires DECISIONS.md note on reasoning (ARCHITECTURE.md 5.7).",
++  "resolvers": [
++    {
++      "id": "quad9",
++      "name": "Quad9",
++      "url": "https://dns.quad9.net/dns-query",
++      "description": "Non-profit. Switzerland. No logging of source IPs. Blocks known malware domains.",
++      "jurisdiction": "Switzerland",
++      "logs": false,
++      "default": true
++    },
++    {
++      "id": "mullvad",
++      "name": "Mullvad",
++      "url": "https://doh.mullvad.net/dns-query",
++      "description": "Privacy-focused VPN provider. Sweden. No-log policy. No malware filtering.",
++      "jurisdiction": "Sweden",
++      "logs": false,
++      "default": false
++    },
++    {
++      "id": "adguard",
++      "name": "AdGuard",
++      "url": "https://dns.adguard-dns.com/dns-query",
++      "description": "Independent. Cyprus. No logging. Blocks ads and trackers at the DNS level.",
++      "jurisdiction": "Cyprus",
++      "logs": false,
++      "default": false
++    },
++    {
++      "id": "cloudflare",
++      "name": "Cloudflare 1.1.1.1",
++      "url": "https://cloudflare-dns.com/dns-query",
++      "description": "US-based. Largest CDN provider. Logs anonymised queries for 24 hours per privacy policy.",
++      "jurisdiction": "United States",
++      "logs": true,
++      "default": false
++    },
++    {
++      "id": "system",
++      "name": "Use my system resolver",
++      "url": "",
++      "description": "Uses your network's default DNS. Right choice if you trust your ISP, run Pi-hole, or use a VPN with its own DNS.",
++      "jurisdiction": "varies",
++      "logs": null,
++      "default": false
++    },
++    {
++      "id": "custom",
++      "name": "Custom URL",
++      "url": "",
++      "description": "Enter a DNS-over-HTTPS URL. For people who run their own resolver.",
++      "jurisdiction": "custom",
++      "logs": null,
++      "default": false
++    }
++  ]
++}
+diff --git a/browser/branding/antumbra/content/antumbra-content/welcome.css b/browser/branding/antumbra/content/antumbra-content/welcome.css
+new file mode 100644
+index 000000000000..13e14e41bdea
+--- /dev/null
++++ b/browser/branding/antumbra/content/antumbra-content/welcome.css
+@@ -0,0 +1,150 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++:root {
++  --void:    #0B0D10;
++  --umbra:   #13181F;
++  --penumbra:#222933;
++  --ash:     #8B95A3;
++  --daylight:#E8ECF1;
++  --corona:  #FFB020;
++  --relay:   #7C5CFF;
++  color-scheme: dark;
++}
++
++*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
++
++body {
++  background: var(--void);
++  color: var(--daylight);
++  font-family: system-ui, sans-serif;
++  font-size: 15px;
++  line-height: 1.5;
++  min-height: 100vh;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++}
++
++.wizard {
++  width: min(520px, 94vw);
++  background: var(--umbra);
++  border: 1px solid var(--penumbra);
++  border-radius: 12px;
++  overflow: hidden;
++}
++
++.screen { display: none; padding: 36px 40px 28px; }
++.screen.active { display: block; }
++
++.logo { text-align: center; margin-bottom: 24px; }
++.logo svg { width: 56px; height: 56px; }
++
++h1 { font-size: 1.45rem; font-weight: 600; margin-bottom: 8px; }
++h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
++.subtitle { color: var(--ash); margin-bottom: 28px; font-size: 0.9rem; }
++
++.mode-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
++
++.mode-card {
++  border: 2px solid var(--penumbra);
++  border-radius: 8px;
++  padding: 14px 16px;
++  cursor: pointer;
++  transition: border-color 0.15s;
++}
++.mode-card:hover { border-color: var(--ash); }
++.mode-card.selected { border-color: var(--corona); }
++.mode-card[data-mode="blackout"].selected { border-color: #555; }
++
++.mode-card .name { font-weight: 600; margin-bottom: 3px; }
++.mode-card .desc { font-size: 0.85rem; color: var(--ash); }
++.mode-card .tradeoff { font-size: 0.8rem; color: var(--ash); margin-top: 4px; font-style: italic; }
++
++.resolver-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
++
++.resolver-item {
++  display: flex;
++  align-items: flex-start;
++  gap: 12px;
++  border: 2px solid var(--penumbra);
++  border-radius: 8px;
++  padding: 12px 14px;
++  cursor: pointer;
++}
++.resolver-item:hover { border-color: var(--ash); }
++.resolver-item.selected { border-color: var(--corona); }
++.resolver-item input[type=radio] { margin-top: 3px; accent-color: var(--corona); }
++.resolver-item .r-name { font-weight: 600; font-size: 0.9rem; }
++.resolver-item .r-desc { font-size: 0.82rem; color: var(--ash); margin-top: 2px; }
++
++#custom-url-row { margin-top: 6px; }
++#custom-url-row input {
++  width: 100%;
++  background: var(--penumbra);
++  border: 1px solid var(--ash);
++  border-radius: 6px;
++  color: var(--daylight);
++  padding: 7px 10px;
++  font-size: 0.9rem;
++}
++
++.tab-options { display: flex; gap: 12px; margin-bottom: 28px; }
++.tab-option {
++  flex: 1;
++  border: 2px solid var(--penumbra);
++  border-radius: 8px;
++  padding: 16px;
++  cursor: pointer;
++  text-align: center;
++}
++.tab-option:hover { border-color: var(--ash); }
++.tab-option.selected { border-color: var(--corona); }
++.tab-option .icon { font-size: 1.6rem; margin-bottom: 6px; }
++.tab-option .label { font-weight: 600; font-size: 0.9rem; }
++
++.pw-box {
++  background: var(--penumbra);
++  border-radius: 8px;
++  padding: 16px;
++  margin-bottom: 20px;
++  font-size: 0.88rem;
++  color: var(--ash);
++}
++.pw-box strong { color: var(--daylight); }
++
++.disclosure-box {
++  background: var(--penumbra);
++  border-radius: 8px;
++  padding: 14px 16px;
++  font-size: 0.82rem;
++  color: var(--ash);
++  margin-bottom: 20px;
++}
++.disclosure-box p + p { margin-top: 8px; }
++
++.actions {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  padding-top: 16px;
++  border-top: 1px solid var(--penumbra);
++}
++
++.btn {
++  border: none;
++  border-radius: 6px;
++  padding: 9px 20px;
++  font-size: 0.9rem;
++  font-weight: 600;
++  cursor: pointer;
++}
++.btn-primary { background: var(--corona); color: var(--void); }
++.btn-primary:hover { background: #ffc040; }
++.btn-secondary { background: transparent; color: var(--ash); border: 1px solid var(--penumbra); }
++.btn-secondary:hover { color: var(--daylight); border-color: var(--ash); }
++
++.step-dots { display: flex; gap: 6px; }
++.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--penumbra); }
++.dot.active { background: var(--corona); }
+diff --git a/browser/branding/antumbra/content/antumbra-content/welcome.html b/browser/branding/antumbra/content/antumbra-content/welcome.html
+new file mode 100644
+index 000000000000..810a79278b78
+--- /dev/null
++++ b/browser/branding/antumbra/content/antumbra-content/welcome.html
+@@ -0,0 +1,138 @@
++<!DOCTYPE html>
++<!-- This Source Code Form is subject to the terms of the Mozilla Public
++   - License, v. 2.0. If a copy of the MPL was not distributed with this
++   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
++<html lang="en">
++<head>
++  <meta charset="UTF-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1">
++  <title>Welcome to Antumbra</title>
++  <link rel="stylesheet" href="chrome://antumbra/content/welcome.css">
++</head>
++<body>
++<div class="wizard">
++
++  <!-- Screen 1: Protection mode picker -->
++  <div class="screen active" id="screen-mode">
++    <div class="logo">
++      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
++        <circle cx="32" cy="32" r="30" fill="none" stroke="#FFB020" stroke-width="5" opacity="0.9"/>
++        <circle cx="32" cy="32" r="20" fill="#0B0D10"/>
++      </svg>
++    </div>
++    <h1>Welcome to Antumbra</h1>
++    <p class="subtitle">Choose your protection level. You can change this any time.</p>
++    <div class="mode-cards">
++      <div class="mode-card selected" data-mode="standard" tabindex="0">
++        <div class="name">Standard</div>
++        <div class="desc">Strict tracking protection, ad blocking, cookie banner rejection. Works with nearly every site.</div>
++        <div class="tradeoff">Good for everyday browsing.</div>
++      </div>
++      <div class="mode-card" data-mode="strict" tabindex="0">
++        <div class="name">Strict</div>
++        <div class="desc">Everything in Standard, plus fingerprinting protection and aggressive parameter stripping. Occasionally breaks logins on complex sites.</div>
++        <div class="tradeoff">Better privacy, some site breakage possible.</div>
++      </div>
++      <div class="mode-card" data-mode="blackout" tabindex="0">
++        <div class="name">Blackout</div>
++        <div class="desc">Maximum hardening. Resist Fingerprinting on, WebRTC restricted, pure-black chrome. Breaks more sites intentionally.</div>
++        <div class="tradeoff">Highest privacy, highest breakage. Use per-site relaxation when needed.</div>
++      </div>
++    </div>
++    <div class="actions">
++      <div class="step-dots">
++        <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
++      </div>
++      <button class="btn btn-primary" id="mode-next">Next</button>
++    </div>
++  </div>
++
++  <!-- Screen 2: DNS resolver picker -->
++  <div class="screen" id="screen-dns">
++    <h1>Encrypted DNS</h1>
++    <p class="subtitle">Antumbra encrypts DNS queries so your internet provider cannot see what sites you visit by name. Choose a resolver.</p>
++    <div class="resolver-list" id="resolver-list"><!-- populated by JS --></div>
++    <div id="custom-url-row" style="display:none">
++      <input type="url" id="custom-url" placeholder="https://your-resolver/dns-query">
++    </div>
++    <div class="actions">
++      <div class="step-dots">
++        <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
++      </div>
++      <div style="display:flex;gap:10px">
++        <button class="btn btn-secondary" id="dns-back">Back</button>
++        <button class="btn btn-primary" id="dns-next">Next</button>
++      </div>
++    </div>
++  </div>
++
++  <!-- Screen 3: Tab orientation -->
++  <div class="screen" id="screen-tabs">
++    <h1>Tab layout</h1>
++    <p class="subtitle">Where would you like your tabs?</p>
++    <div class="tab-options">
++      <div class="tab-option selected" data-tabs="vertical" tabindex="0">
++        <div class="icon">&#9707;</div>
++        <div class="label">Vertical (left sidebar)</div>
++      </div>
++      <div class="tab-option" data-tabs="horizontal" tabindex="0">
++        <div class="icon">&#9636;</div>
++        <div class="label">Horizontal (top bar)</div>
++      </div>
++    </div>
++    <div class="actions">
++      <div class="step-dots">
++        <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
++      </div>
++      <div style="display:flex;gap:10px">
++        <button class="btn btn-secondary" id="tabs-back">Back</button>
++        <button class="btn btn-primary" id="tabs-next">Next</button>
++      </div>
++    </div>
++  </div>
++
++  <!-- Screen 4: Primary password offer -->
++  <div class="screen" id="screen-password">
++    <h1>Password vault</h1>
++    <p class="subtitle">Antumbra includes a built-in password manager.</p>
++    <div class="pw-box">
++      <p><strong>Set a primary password</strong> to encrypt your saved passwords with a key only you know.</p>
++      <p style="margin-top:8px">Without one, your saved passwords are encrypted with a key stored next to them. Anyone with access to your profile can read them.</p>
++    </div>
++    <p style="font-size:0.85rem;color:var(--ash);margin-bottom:20px">You can set a primary password later in Settings &rsaquo; Privacy &amp; Security &rsaquo; Passwords.</p>
++    <div class="actions">
++      <div class="step-dots">
++        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
++      </div>
++      <div style="display:flex;gap:10px">
++        <button class="btn btn-secondary" id="pw-back">Back</button>
++        <button class="btn btn-primary" id="pw-next">Got it, continue</button>
++      </div>
++    </div>
++  </div>
++
++  <!-- Screen 5: Update method + network disclosures -->
++  <div class="screen" id="screen-updates">
++    <h1>How updates work</h1>
++    <p class="subtitle">Antumbra does not yet have a built-in updater. Updates are delivered through your package manager or as direct downloads from GitHub Releases.</p>
++    <div class="disclosure-box">
++      <p><strong>Two background connections you should know about:</strong></p>
++      <p><strong>Remote Settings</strong> (Mozilla): periodically downloads certificate revocation data, tracking protection lists, and cookie banner rejection rules. No data is uploaded. Required for security and for cookie banner blocking to work.</p>
++      <p><strong>Safe Browsing</strong> (Google): local malware and phishing lists are checked against your visits. The per-download remote lookup that sends URLs to Google is disabled. Only local list checks run.</p>
++      <p>Both are disclosed in the privacy policy. Neither is telemetry.</p>
++    </div>
++    <div class="actions">
++      <div class="step-dots">
++        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
++      </div>
++      <div style="display:flex;gap:10px">
++        <button class="btn btn-secondary" id="updates-back">Back</button>
++        <button class="btn btn-primary" id="updates-finish">Start browsing</button>
++      </div>
++    </div>
++  </div>
++
++</div>
++<script src="chrome://antumbra/content/welcome.js"></script>
++</body>
++</html>
+diff --git a/browser/branding/antumbra/content/antumbra-content/welcome.js b/browser/branding/antumbra/content/antumbra-content/welcome.js
+new file mode 100644
+index 000000000000..3114b1d25c42
+--- /dev/null
++++ b/browser/branding/antumbra/content/antumbra-content/welcome.js
+@@ -0,0 +1,164 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++/* Antumbra first-run wizard controller.
++ * Runs in a privileged chrome page (chrome://antumbra/content/welcome.html).
++ * Writes user choices to prefs via Services.prefs and closes.
++ */
++
++"use strict";
++
++const { Services } = ChromeUtils.importESModule(
++  "resource://gre/modules/Services.sys.mjs"
++);
++const { AntumbraMode } = ChromeUtils.importESModule(
++  "chrome://antumbra/content/AntumbraMode.sys.mjs"
++);
++
++// --- State ---
++let selectedMode = "standard";
++let selectedResolver = null;
++let selectedTabs = "vertical";
++let resolvers = [];
++
++// --- Screen navigation ---
++const screens = ["screen-mode", "screen-dns", "screen-tabs", "screen-password", "screen-updates"];
++let currentScreen = 0;
++
++function showScreen(idx) {
++  screens.forEach((id, i) => {
++    document.getElementById(id).classList.toggle("active", i === idx);
++  });
++  currentScreen = idx;
++}
++
++// --- Mode picker ---
++document.querySelectorAll(".mode-card").forEach(card => {
++  card.addEventListener("click", () => {
++    document.querySelectorAll(".mode-card").forEach(c => c.classList.remove("selected"));
++    card.classList.add("selected");
++    selectedMode = card.dataset.mode;
++  });
++  card.addEventListener("keydown", e => {
++    if (e.key === "Enter" || e.key === " ") card.click();
++  });
++});
++
++document.getElementById("mode-next").addEventListener("click", () => showScreen(1));
++
++// --- DNS resolver picker ---
++async function loadResolvers() {
++  try {
++    const resp = await fetch("chrome://antumbra/content/dns-resolvers.json");
++    const data = await resp.json();
++    resolvers = data.resolvers;
++  } catch {
++    // Fallback: Quad9 only.
++    resolvers = [{
++      id: "quad9", name: "Quad9",
++      url: "https://dns.quad9.net/dns-query",
++      description: "Non-profit. Switzerland. No logging of source IPs.",
++      default: true
++    }];
++  }
++
++  const list = document.getElementById("resolver-list");
++  list.innerHTML = "";
++  resolvers.forEach(r => {
++    const item = document.createElement("div");
++    item.className = "resolver-item" + (r.default ? " selected" : "");
++    item.dataset.id = r.id;
++    item.innerHTML = `
++      <input type="radio" name="resolver" value="${r.id}" ${r.default ? "checked" : ""}>
++      <div>
++        <div class="r-name">${r.name}</div>
++        <div class="r-desc">${r.description}</div>
++      </div>`;
++    item.addEventListener("click", () => {
++      document.querySelectorAll(".resolver-item").forEach(el => el.classList.remove("selected"));
++      item.classList.add("selected");
++      item.querySelector("input").checked = true;
++      selectedResolver = r;
++      document.getElementById("custom-url-row").style.display =
++        r.id === "custom" ? "block" : "none";
++    });
++    list.appendChild(item);
++    if (r.default) selectedResolver = r;
++  });
++}
++
++loadResolvers();
++
++document.getElementById("dns-back").addEventListener("click", () => showScreen(0));
++document.getElementById("dns-next").addEventListener("click", () => showScreen(2));
++
++// --- Tab layout ---
++document.querySelectorAll(".tab-option").forEach(opt => {
++  opt.addEventListener("click", () => {
++    document.querySelectorAll(".tab-option").forEach(o => o.classList.remove("selected"));
++    opt.classList.add("selected");
++    selectedTabs = opt.dataset.tabs;
++  });
++});
++
++document.getElementById("tabs-back").addEventListener("click", () => showScreen(1));
++document.getElementById("tabs-next").addEventListener("click", () => showScreen(3));
++
++// --- Password screen ---
++document.getElementById("pw-back").addEventListener("click", () => showScreen(2));
++document.getElementById("pw-next").addEventListener("click", () => showScreen(4));
++
++// --- Updates screen ---
++document.getElementById("updates-back").addEventListener("click", () => showScreen(3));
++document.getElementById("updates-finish").addEventListener("click", applyChoicesAndClose);
++
++// --- Apply all choices ---
++function applyChoicesAndClose() {
++  // 1. Protection mode
++  try {
++    AntumbraMode.applyMode(selectedMode);
++  } catch (e) {
++    console.error("AntumbraMode.applyMode failed:", e);
++  }
++
++  // 2. DNS resolver
++  if (selectedResolver) {
++    if (selectedResolver.id === "system") {
++      // System resolver: disable TRR (mode 0).
++      Services.prefs.setIntPref("network.trr.mode", 0);
++    } else if (selectedResolver.id === "custom") {
++      const url = document.getElementById("custom-url").value.trim();
++      if (url) {
++        Services.prefs.setCharPref("network.trr.uri", url);
++        Services.prefs.setCharPref("network.trr.custom_uri", url);
++        Services.prefs.setIntPref("network.trr.mode", 2);
++      }
++    } else if (selectedResolver.url) {
++      Services.prefs.setCharPref("network.trr.uri", selectedResolver.url);
++      Services.prefs.setCharPref("network.trr.custom_uri", selectedResolver.url);
++      Services.prefs.setIntPref("network.trr.mode", 2);
++    }
++  }
++
++  // 3. Tab layout
++  try {
++    // sidebar.verticalTabs may not exist in all ESR 153 builds (ARCHITECTURE.md 6.8).
++    if (Services.prefs.getPrefType("sidebar.verticalTabs") !== Services.prefs.PREF_INVALID) {
++      Services.prefs.setBoolPref("sidebar.verticalTabs", selectedTabs === "vertical");
++    }
++    if (Services.prefs.getPrefType("sidebar.revamp") !== Services.prefs.PREF_INVALID) {
++      Services.prefs.setBoolPref("sidebar.revamp", selectedTabs === "vertical");
++    }
++  } catch (e) {
++    console.warn("sidebar prefs not available in this build:", e);
++  }
++
++  // 4. Mark first run complete so the wizard does not re-open.
++  Services.prefs.setBoolPref("antumbra.firstrun.complete", true);
++  // Clear the welcome URL so subsequent new tabs go to about:newtab.
++  Services.prefs.setCharPref("startup.homepage_welcome_url", "");
++
++  // 5. Close this tab.
++  window.close();
++}

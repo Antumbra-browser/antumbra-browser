@@ -1,0 +1,150 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+:root {
+  --void:    #0B0D10;
+  --umbra:   #13181F;
+  --penumbra:#222933;
+  --ash:     #8B95A3;
+  --daylight:#E8ECF1;
+  --corona:  #FFB020;
+  --relay:   #7C5CFF;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--void);
+  color: var(--daylight);
+  font-family: system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wizard {
+  width: min(520px, 94vw);
+  background: var(--umbra);
+  border: 1px solid var(--penumbra);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.screen { display: none; padding: 36px 40px 28px; }
+.screen.active { display: block; }
+
+.logo { text-align: center; margin-bottom: 24px; }
+.logo svg { width: 56px; height: 56px; }
+
+h1 { font-size: 1.45rem; font-weight: 600; margin-bottom: 8px; }
+h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+.subtitle { color: var(--ash); margin-bottom: 28px; font-size: 0.9rem; }
+
+.mode-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+
+.mode-card {
+  border: 2px solid var(--penumbra);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.mode-card:hover { border-color: var(--ash); }
+.mode-card.selected { border-color: var(--corona); }
+.mode-card[data-mode="blackout"].selected { border-color: #555; }
+
+.mode-card .name { font-weight: 600; margin-bottom: 3px; }
+.mode-card .desc { font-size: 0.85rem; color: var(--ash); }
+.mode-card .tradeoff { font-size: 0.8rem; color: var(--ash); margin-top: 4px; font-style: italic; }
+
+.resolver-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+
+.resolver-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 2px solid var(--penumbra);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.resolver-item:hover { border-color: var(--ash); }
+.resolver-item.selected { border-color: var(--corona); }
+.resolver-item input[type=radio] { margin-top: 3px; accent-color: var(--corona); }
+.resolver-item .r-name { font-weight: 600; font-size: 0.9rem; }
+.resolver-item .r-desc { font-size: 0.82rem; color: var(--ash); margin-top: 2px; }
+
+#custom-url-row { margin-top: 6px; }
+#custom-url-row input {
+  width: 100%;
+  background: var(--penumbra);
+  border: 1px solid var(--ash);
+  border-radius: 6px;
+  color: var(--daylight);
+  padding: 7px 10px;
+  font-size: 0.9rem;
+}
+
+.tab-options { display: flex; gap: 12px; margin-bottom: 28px; }
+.tab-option {
+  flex: 1;
+  border: 2px solid var(--penumbra);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+.tab-option:hover { border-color: var(--ash); }
+.tab-option.selected { border-color: var(--corona); }
+.tab-option .icon { font-size: 1.6rem; margin-bottom: 6px; }
+.tab-option .label { font-weight: 600; font-size: 0.9rem; }
+
+.pw-box {
+  background: var(--penumbra);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  color: var(--ash);
+}
+.pw-box strong { color: var(--daylight); }
+
+.disclosure-box {
+  background: var(--penumbra);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 0.82rem;
+  color: var(--ash);
+  margin-bottom: 20px;
+}
+.disclosure-box p + p { margin-top: 8px; }
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--penumbra);
+}
+
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 9px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary { background: var(--corona); color: var(--void); }
+.btn-primary:hover { background: #ffc040; }
+.btn-secondary { background: transparent; color: var(--ash); border: 1px solid var(--penumbra); }
+.btn-secondary:hover { color: var(--daylight); border-color: var(--ash); }
+
+.step-dots { display: flex; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--penumbra); }
+.dot.active { background: var(--corona); }

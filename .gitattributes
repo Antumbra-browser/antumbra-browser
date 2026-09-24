@@ -1,0 +1,12 @@
+# Shell scripts must have LF line endings so they execute correctly on Linux CI.
+*.sh text eol=lf
+*.py text eol=lf
+
+# YAML files: LF
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Patch files: binary to avoid line-ending corruption
+*.patch binary
+
+# Default: let git handle other text files normally

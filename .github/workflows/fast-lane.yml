@@ -1,0 +1,185 @@
+name: Fast-lane CI
+
+# Runs on every push and pull request to main.
+# IMPORTANT (D7, ARCHITECTURE.md 10.2): this workflow must never trigger a
+# Firefox build. Firefox builds run on the maintainer's local Windows machine
+# only. GitHub-hosted runners have insufficient disk space and job time limits.
+
+on:
+  push:
+    branches: ["main", "milestone-*"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+
+  pref-audit:
+    name: Pref audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Fetch upstream pref files at pinned tag
+        run: |
+          # Download only the pref files needed for the audit.
+          # Full Firefox checkout is not required and exceeds CI disk limits (D7).
+          TAG="FIREFOX_153_3_0esr_RELEASE"
+          BASE="https://hg.mozilla.org/releases/mozilla-esr153/raw-file/${TAG}"
+          mkdir -p upstream-prefs/browser/app/profile
+          mkdir -p upstream-prefs/modules/libpref/init
+          curl -sSf "${BASE}/browser/app/profile/firefox.js" \
+            -o upstream-prefs/browser/app/profile/firefox.js
+          curl -sSf "${BASE}/modules/libpref/init/all.js" \
+            -o upstream-prefs/modules/libpref/init/all.js
+          curl -sSf "${BASE}/modules/libpref/init/StaticPrefList.yaml" \
+            -o upstream-prefs/modules/libpref/init/StaticPrefList.yaml
+          curl -sSf "${BASE}/browser/app/profile/channel-prefs.js" \
+            -o upstream-prefs/browser/app/profile/channel-prefs.js || true
+
+      - name: Run pref audit
+        run: |
+          python scripts/audit-prefs.py \
+            --prefs prefs/antumbra.js \
+            --firefox-src upstream-prefs
+
+  patch-apply-check:
+    name: Patch apply check (dry run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch upstream files needed for patch check
+        run: |
+          # Only browser/moz.build is modified by an existing-file patch.
+          # All other Milestone 1 patches create new files, which need no
+          # existing content to pass git apply --check.
+          # Fetching one file avoids a full Firefox clone (20+ GB, D7).
+          TAG="FIREFOX_153_3_0esr_RELEASE"
+          BASE="https://hg.mozilla.org/releases/mozilla-esr153/raw-file/${TAG}"
+          mkdir -p upstream-firefox/browser
+          curl -sSf "${BASE}/browser/moz.build" \
+            -o upstream-firefox/browser/moz.build
+          cd upstream-firefox
+          git init -q
+          git config user.email "ci@antumbra"
+          git config user.name "CI"
+          git add .
+          git commit -q -m "stub: ESR 153 files for patch apply check"
+
+      - name: Check patches apply cleanly (dry run -- no changes made)
+        run: bash scripts/apply-patches.sh --check --firefox-src upstream-firefox
+
+  license-check:
+    name: License check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify LICENSE file contains MPL 2.0 text
+        run: |
+          if ! grep -q "Mozilla Public License" LICENSE; then
+            echo "LICENSE file missing or does not contain MPL 2.0 text."
+            exit 1
+          fi
+          echo "LICENSE check passed."
+
+      - name: Verify every third_party/extensions/ entry has a LICENSE file
+        run: |
+          MISSING=0
+          for dir in third_party/extensions/*/; do
+            [[ -d "$dir" ]] || continue
+            if [[ ! -f "${dir}LICENSE" ]]; then
+              echo "MISSING LICENSE: ${dir}"
+              MISSING=1
+            fi
+          done
+          if [[ $MISSING -ne 0 ]]; then
+            echo "License check FAILED: missing LICENSE files in third_party/extensions/."
+            exit 1
+          fi
+          echo "third_party/extensions/ LICENSE check passed."
+
+      - name: Verify THIRD-PARTY.md has a row for every third_party/extensions/ entry
+        run: |
+          MISSING=0
+          for dir in third_party/extensions/*/; do
+            [[ -d "$dir" ]] || continue
+            name="$(basename "${dir}")"
+            if ! grep -qi "${name}" THIRD-PARTY.md; then
+              echo "MISSING THIRD-PARTY.md row for: ${name}"
+              MISSING=1
+            fi
+          done
+          if [[ $MISSING -ne 0 ]]; then
+            echo "License check FAILED: missing THIRD-PARTY.md rows."
+            exit 1
+          fi
+          echo "THIRD-PARTY.md check passed."
+
+  branding-check:
+    name: Branding check (no Mozilla trademarks in brand strings)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check brand string files for Mozilla trademarks
+        run: |
+          # Brand string files must not contain Firefox, Mozilla, or Nightly.
+          # "Based on Firefox" in technical documentation is acceptable
+          # (ARCHITECTURE.md 11.3), but brand strings shown to users must not
+          # carry Mozilla trademarks.
+          FAILED=0
+          for f in \
+              branding/antumbra/locales/en-US/brand.ftl \
+              branding/antumbra/locales/en-US/brand.properties \
+              branding/antumbra/configure.sh; do
+            if [[ ! -f "$f" ]]; then
+              echo "WARNING: expected branding file not found: $f"
+              continue
+            fi
+            # Skip comment lines (# and //); check all non-comment content.
+            if grep -v '^\s*[#/]' "$f" \
+                | grep -qiE '\bFirefox\b|\bMozilla\b|\bNightly\b'; then
+              echo "TRADEMARK FOUND in ${f}:"
+              grep -nv '^\s*[#/]' "$f" \
+                | grep -iE '\bFirefox\b|\bMozilla\b|\bNightly\b' || true
+              FAILED=1
+            fi
+          done
+          if [[ $FAILED -ne 0 ]]; then
+            echo "Branding check FAILED: Mozilla trademarks in brand strings."
+            exit 1
+          fi
+          echo "Branding check passed."
+
+  docs-check:
+    name: Docs check (no em dashes)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for em dashes in docs
+        run: |
+          # House style: no em dashes (U+2014, encoded as UTF-8 bytes E2 80 94).
+          # Use a hyphen or rephrase. See CONTRIBUTING.md and ARCHITECTURE.md 10.3.
+          FAILED=0
+          while IFS= read -r -d '' f; do
+            if LC_ALL=C grep -qP '\xe2\x80\x94' "$f"; then
+              echo "EM DASH FOUND: $f"
+              LC_ALL=C grep -nP '\xe2\x80\x94' "$f" || true
+              FAILED=1
+            fi
+          done < <(find . -name "*.md" \
+            -not -path "./third_party/*" \
+            -not -path "./.git/*" \
+            -print0)
+          if [[ $FAILED -ne 0 ]]; then
+            echo "Docs check FAILED: em dashes found. Use hyphens or rephrase."
+            exit 1
+          fi
+          echo "Docs check passed (no em dashes)."

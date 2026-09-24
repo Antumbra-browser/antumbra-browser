@@ -562,6 +562,21 @@ because onboarding is the differentiator.
 - A privacy policy that is accurate, including the Remote Settings and Safe
   Browsing disclosures from ARCHITECTURE.md 5.8.
 
+**Before launch (blockers -- release must not ship without these)**
+- [ ] **Purchase antumbrabrowser.org domain.** The update URL prefs
+  `app.update.url.manual` and `app.update.url.details` in
+  `branding/antumbra/pref/firefox-branding.js` point at
+  `https://antumbrabrowser.org/releases`. These URLs appear in the browser UI
+  wherever Firefox would otherwise show an update link. They are unreachable until
+  the domain is registered and the releases page is live. Start this early --
+  domain registration is fast but building the releases page is not.
+- [ ] **Note Multi-Account Containers branding in release notes.** MAC ships
+  unmodified for Milestone 1 (Option C: replace with native container UI in a later
+  milestone). The extension's own UI displays "Firefox Multi-Account Containers."
+  Add one line to the Milestone 1 release notes stating that Multi-Account Containers
+  is a Mozilla product bundled unmodified, and that native container UI is planned
+  for a future release.
+
 ### Explicitly out of scope for milestone 1
 
 Cookie clearing on tab close, the per-site consent panel, the privacy dashboard,
@@ -672,6 +687,12 @@ feature most likely to generate support load and the evidence is the defense.
 - [ ] **Vertical tabs**, if deferred from milestone 1.
 - [ ] Interface polish against BRANDING.md section 7: `--void` grounds, `--corona`
       accents, per-mode chrome color coding, monochrome in Blackout mode.
+- [ ] **Native container UI to replace Multi-Account Containers.** MAC ships in
+      Milestone 1 unmodified and its own UI displays "Firefox Multi-Account
+      Containers." This milestone is the right place to replace it: build container
+      management into the antumbra-core extension or as a chrome-level panel, remove
+      MAC from the bundle, and drop the branding inconsistency. The MAC XPI stays in
+      `third_party/extensions/` as a reference until the replacement ships.
 - [ ] **Split view.** Scheduled last within this milestone, deliberately, so that
       cutting it costs nothing already built. ARCHITECTURE.md 6.8 flags it as the
       highest permanent maintenance cost in the spec. It is worth building only
@@ -791,7 +812,7 @@ This never stops and should be budgeted as real recurring time, not as slack.
 | Cadence | Work |
 |---|---|
 | **Per upstream security release** | Rebase, build, smoke test, ship. Target measured in days, published in `SECURITY.md`. |
-| **Every 4 weeks** | Pref audit review, bundled extension version bumps, filter list and Open Cookie Database refreshes. |
+| **Every 4 weeks** | Pref audit review, bundled extension version bumps (see `docs/extension-update-process.md` for the written process), filter list and Open Cookie Database refreshes. |
 | **Annually (ESR)** | The major rebase. Budget one to two hard weeks. Every layer 5 patch is re-evaluated here, and this is the natural moment to drop one that has become too expensive. |
 | **Continuously** | Site breakage reports. This is the dominant support cost for any browser with aggressive defaults, and it arrives forever. |
 

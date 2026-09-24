@@ -351,6 +351,46 @@ Rust), because build times differ by two orders of magnitude.
 
 ---
 
+## 2026-09-23 (Milestone 1 planning)
+
+---
+
+### D10. Bundled extensions auto-update from AMO; Antumbra never blocks extension security updates
+
+**Decision.** Bundled extensions (uBlock Origin, Consent-O-Matic, Multi-Account
+Containers) **auto-update from AMO**. The XPI files vendored in
+`distribution/extensions/` serve as the initial install baseline only. After first
+launch, Firefox's addon update service picks up newer versions from each extension's
+AMO update manifest. `updates_disabled` is NOT set in `policies.json`.
+
+**Reasoning.**
+
+uBlock Origin and Consent-O-Matic are effective only when current. Their core value
+is delivered through frequently updated filter lists, consent rules, and bug fixes.
+A stale uBlock Origin ships outdated block lists that miss new trackers and ads. A
+stale Consent-O-Matic misses new consent banner patterns. Pinning these extensions
+would mean Antumbra's primary privacy layers degrade silently with every passing week.
+An old blocker is a broken blocker.
+
+Extension security updates are in the same category as browser security updates.
+Blocking them to achieve version control is trading user security for operational
+convenience. Antumbra does not make that trade.
+
+The vendored XPI baseline exists so new installs start at a reviewed, working version
+rather than at an AMO version that may be weeks ahead of any testing. The baseline
+refresh process (`docs/extension-update-process.md`) keeps this starting point current
+so the gap between shipped and current stays small.
+
+**Consequence.** The vendored XPIs in `third_party/extensions/` are not a version pin.
+They are a snapshot reviewed at release time. Users will run newer extension versions
+than what was vendored, which is intentional. The refresh process (every 4 weeks and
+at each Antumbra release) keeps the baseline close to AMO current.
+
+**Affects:** `.planning/phases/01-milestone-1/01-03-PLAN.md` Task 2 and Task 3,
+`prefs/policies.json`.
+
+---
+
 ## Still open
 
 Carried forward from ARCHITECTURE.md section 13. Not yet decided.

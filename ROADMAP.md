@@ -375,6 +375,7 @@ Record the result in the build times table below, replacing the expected values.
 | Build type | Expected | Measured | Job count | When you use it |
 |---|---|---|---|---|
 | **Clean full build** | 60 to 90 min | 46m54s (2026-09-23) | 16 (default) | First build, after a rebase, after a mozconfig change |
+| **Full build**, warm sccache | varies | 47s (2026-09-24) | 16 (default) | Second build after branding assets added; no C++ changes, sccache hot |
 | **Incremental**, C++ change | 2 to 15 min | _not yet measured_ | 16 | Editing Gecko. A widely included header touches everything and approaches a full rebuild. |
 | **`./mach build faster`** | Seconds to ~2 min | 8s (2026-09-23) | n/a | **Frontend only**: JS, CSS, XHTML, prefs, branding assets. Most of Antumbra's milestone 1 work. |
 | **Artifact build** | 1 to 5 min | _not yet measured_ | n/a | Frontend iteration only. See the warning below. |
@@ -513,9 +514,9 @@ because onboarding is the differentiator.
 ### In scope
 
 **Identity**
-- Full Antumbra branding: name, icon set, about dialog, window title. All Mozilla
-  trademarks removed.
-- Custom branding directory. Not `--enable-official-branding`.
+- [x] Full Antumbra branding: name, icon set, about dialog, window title. All Mozilla
+  trademarks removed. Verified 2026-09-24.
+- [x] Custom branding directory. Not `--enable-official-branding`.
 
 **Privacy baseline, prefs and build flags only** (ARCHITECTURE.md section 5)
 - Strict ETP, Total Cookie Protection, storage partitioning.

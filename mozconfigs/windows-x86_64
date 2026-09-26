@@ -13,13 +13,6 @@ ac_add_options --disable-debug
 ac_add_options --disable-crashreporter
 ac_add_options --disable-parental-controls
 ac_add_options --disable-default-browser-agent
-export MOZ_TELEMETRY_REPORTING=0
-export MOZ_DATA_REPORTING=0
-export MOZ_SERVICES_HEALTHREPORT=0
-export MOZ_NORMANDY=0
-export MOZ_CRASHREPORTER=0
-export MOZ_TELEMETRY_ON_BY_DEFAULT=0
-
 # Extension signing: stays on (D3 -- no MOZ_REQUIRE_SIGNING=0)
 
 # Application identity

@@ -436,6 +436,57 @@ later alongside the VPN button decision (D4).
 
 ---
 
+## 2026-09-27
+
+---
+
+### D12. Disable weather widget: showWeather = false
+
+**Decision.** `browser.newtabpage.activity-stream.showWeather` is set to `false` in `antumbra.js`.
+
+**Reasoning.**
+
+The weather widget on the new tab page makes an outbound request to Mozilla's Merino service on every tab open to determine the user's location. The request carries the user's IP address. This is a phone-home that the user did not ask for, that reveals location on a per-tab basis, and that has no privacy disclosure in Firefox's onboarding. It is incompatible with Antumbra's zero-unrequested-network-contact baseline and is disabled at the pref layer.
+
+**Consequence.** No weather widget. No loss of privacy-relevant functionality.
+
+**Affects:** `prefs/antumbra.js`.
+
+---
+
+### D13. Disable topsites/shortcuts section: feeds.topsites = false
+
+**Decision.** `browser.newtabpage.activity-stream.feeds.topsites` is set to `false` in `antumbra.js`.
+
+**Reasoning.**
+
+The topsites section displays a "Drag important tabs here" placeholder populated with default vendor shortcuts (Firefox, Slack, Gmail logos). These are Mozilla-chosen brand relationships bundled into the new tab page with no user opt-in. The placeholder with vendor icons is incompatible with the no-sponsored-content, no-content-recommendations baseline in spec section 9 and ARCHITECTURE.md 6.9. This pref was listed in ARCHITECTURE.md 6.9's exclusion table but was accidentally omitted from the initial `antumbra.js`. This decision corrects that omission.
+
+**Consequence.** No topsites row on the new tab page.
+
+**Affects:** `prefs/antumbra.js`.
+
+---
+
+### D14. Build policy: cold builds required for branding, prefs, and packaged file changes
+
+**Decision.** Any build that is meant to verify a change to branding assets, pref files, or chrome-packaged files (JS, CSS, HTML, JSON under the branding or components directories) must be a cold build from a wiped object directory. Incremental builds on these file types are not acceptable for verification purposes.
+
+**Reasoning.**
+
+Three builds were wasted between 2026-09-24 and 2026-09-27 because incremental builds silently reused stale object directory state. Pref file changes (`antumbra.js`) did not reach the binary. Chrome-packaged file changes (welcome page, policies.json) did not land because their jar was not repacked. Only a file with a timestamp change that forced the packager to re-run (an SVG) reached the binary. The incremental build gave no error or warning. The developer assumed the build was correct and proceeded to on-screen verification, which then failed.
+
+The root cause is that Firefox's incremental build system tracks source timestamps, and a file that is identical to the indexed version is not repacked even if the output jar is missing or stale. A cold build starts from scratch and eliminates this class of silent failure.
+
+**Rule:**
+1. Wipe the object directory (`rm -rf obj-*`) before any build that verifies a pref, branding, policy, or packaged file change.
+2. Confirm the built artifacts are present in the build output before requesting on-screen verification. Check for the specific files (antumbra.js in the JAR, policies.json in the distribution directory, welcome files in the chrome directory) by path before launching.
+3. Never ask the user to verify what they see on screen if you have not independently confirmed the artifact is present in the build output.
+
+**Affects:** `ROADMAP.md` build policy section, all future milestone execution.
+
+---
+
 ## Still open
 
 Carried forward from ARCHITECTURE.md section 13. Not yet decided.

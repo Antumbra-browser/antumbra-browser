@@ -50,6 +50,12 @@ pref("browser.safebrowsing.provider.google4.gethashURL", "");
 pref("cookiebanners.service.mode", 1);
 pref("cookiebanners.service.mode.privateBrowsing", 1);
 
+/* --- New tab page: weather widget off (sends IP to Mozilla Merino on every open) --- */
+pref("browser.newtabpage.activity-stream.showWeather", false);
+
+/* --- New tab page: topsites/shortcuts section off (shows vendor default site icons) --- */
+pref("browser.newtabpage.activity-stream.feeds.topsites", false);
+
 /* --- Sponsored content and suggestions off --- */
 pref("browser.newtabpage.activity-stream.showSponsored", false);
 pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);

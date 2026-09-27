@@ -1,9 +1,9 @@
 diff --git a/browser/app/profile/antumbra.js b/browser/app/profile/antumbra.js
 new file mode 100644
-index 000000000000..2c16857818cf
+index 000000000000..57cb56e0472e
 --- /dev/null
 +++ b/browser/app/profile/antumbra.js
-@@ -0,0 +1,79 @@
+@@ -0,0 +1,85 @@
 +/* This Source Code Form is subject to the terms of the Mozilla Public
 + * License, v. 2.0. If a copy of the MPL was not distributed with this
 + * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -55,6 +55,12 @@ index 000000000000..2c16857818cf
 +/* --- Cookie banner rejection (mode 1 = reject only, never accept) --- */
 +pref("cookiebanners.service.mode", 1);
 +pref("cookiebanners.service.mode.privateBrowsing", 1);
++
++/* --- New tab page: weather widget off (sends IP to Mozilla Merino on every open) --- */
++pref("browser.newtabpage.activity-stream.showWeather", false);
++
++/* --- New tab page: topsites/shortcuts section off (shows vendor default site icons) --- */
++pref("browser.newtabpage.activity-stream.feeds.topsites", false);
 +
 +/* --- Sponsored content and suggestions off --- */
 +pref("browser.newtabpage.activity-stream.showSponsored", false);

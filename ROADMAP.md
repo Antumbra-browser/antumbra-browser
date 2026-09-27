@@ -514,8 +514,8 @@ because onboarding is the differentiator.
 ### In scope
 
 **Identity**
-- [x] Full Antumbra branding: name, icon set, about dialog, window title. All Mozilla
-  trademarks removed. Verified 2026-09-24.
+- [ ] Full Antumbra branding: name, icon set, about dialog, window title. All Mozilla
+  trademarks removed. Build confirmed 2026-09-24; visual verification pending.
 - [x] Custom branding directory. Not `--enable-official-branding`.
 
 **Privacy baseline, prefs and build flags only** (ARCHITECTURE.md section 5)
@@ -803,6 +803,20 @@ whether this is affordable.
 Android is where Play and F-Droid requirements pull in opposite directions, which
 is the main reason it is a separate phase rather than an extension of the desktop
 work.
+
+---
+
+## Build policy (standing rule, all milestones)
+
+**Cold builds are required before on-screen verification of any of the following: branding assets, pref file changes, policy file changes, chrome-packaged files (JS, CSS, HTML, JSON in branding or components directories).**
+
+Incremental builds silently reuse stale object directory state and do not repack jars when source files are updated but timestamps are not forced. Three builds were lost to this between 2026-09-24 and 2026-09-27. The rule is simple:
+
+1. Wipe the object directory before any verification build: `rm -rf obj-*/`
+2. Confirm built artifacts are present by path before launching.
+3. Do not request on-screen verification before step 2 passes.
+
+See D14 in DECISIONS.md for the full reasoning.
 
 ---
 

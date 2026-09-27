@@ -521,7 +521,7 @@ index 000000000000..3114b1d25c42
 +  "resource://gre/modules/Services.sys.mjs"
 +);
 +const { AntumbraMode } = ChromeUtils.importESModule(
-+  "chrome://antumbra/content/AntumbraMode.sys.mjs"
++  "resource://antumbra/AntumbraMode.sys.mjs"
 +);
 +
 +// --- State ---

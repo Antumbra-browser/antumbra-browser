@@ -58,6 +58,16 @@ pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
 /* --- Pocket off --- */
 pref("extensions.pocket.enabled", false);
 
+/* --- Content recommendations (discovery stream) off --- */
+pref("browser.newtabpage.activity-stream.discoverystream.enabled", false);
+
+/* --- Private browsing page: Mozilla promotional content off --- */
+pref("browser.vpn_promo.enabled", false);
+pref("browser.promo.focus.enabled", false);
+pref("browser.promo.pin.enabled", false);
+pref("browser.promo.cookiebanners.enabled", false);
+pref("browser.search.separatePrivateDefault.ui.enabled", false);
+
 /* --- First run / welcome --- */
 pref("browser.aboutwelcome.enabled", false);
 

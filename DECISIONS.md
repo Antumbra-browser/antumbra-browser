@@ -391,6 +391,51 @@ at each Antumbra release) keeps the baseline close to AMO current.
 
 ---
 
+---
+
+## 2026-09-26
+
+---
+
+### D11. Default search engine: DuckDuckGo in both normal and private windows
+
+**Decision.** DuckDuckGo is the default search engine for all windows -- normal
+and private -- set via `policies.json` SearchEngines. No search revenue
+partnership is accepted at this stage.
+
+**Reasoning.**
+
+The open question asked whether taking search revenue is compatible with the
+privacy positioning. The answer is: not yet, and not with the wrong partner.
+
+A default search deal with Google would be incompatible with the stated
+positioning regardless of revenue. Google is the largest surveillance advertising
+business on the internet. Shipping Google as the default while describing
+Antumbra as a privacy browser would be incoherent.
+
+DuckDuckGo is the least-bad option among broadly available engines: no IP
+logging by policy, no user profiling by policy, and a documented privacy
+commitment that aligns closely enough with Antumbra's positioning to be
+defensible in onboarding copy. It is also the engine most users expect to see
+in a privacy browser, which reduces friction.
+
+Revenue from a DuckDuckGo default is possible via their search attribution
+program but is not a condition of this decision and is not being pursued in
+milestone 1. This decision does not preclude revisiting a revenue arrangement
+with DuckDuckGo or another privacy-aligned engine in a later milestone, provided
+full disclosure is maintained.
+
+The private window default is set to DuckDuckGo explicitly to prevent the
+"separate private default" search banner from appearing and to keep behavior
+consistent for users.
+
+**Consequence.** No search revenue in milestone 1. Revisit at milestone 5 or
+later alongside the VPN button decision (D4).
+
+**Affects:** `prefs/policies.json`, open question 2 (closed).
+
+---
+
 ## Still open
 
 Carried forward from ARCHITECTURE.md section 13. Not yet decided.
@@ -398,6 +443,5 @@ Carried forward from ARCHITECTURE.md section 13. Not yet decided.
 | # | Question | Needed by |
 |---|---|---|
 | 1 | **Split view.** Highest permanent maintenance cost in the spec. Confirm it is worth an annual re-patch against actively refactored front end code. | Milestone 4 |
-| 2 | **Search default.** Every browser must answer it, and it is the most obvious non-affiliate revenue source. Decide whether taking search revenue is compatible with the positioning. | Milestone 1 |
 | 3 | **Default DNS resolver.** An editorial choice with real privacy consequences. The reasoning must be published, not made quietly. | Milestone 1 |
 | 4 | **Funding.** Signing, a domain, and a trademark clearance opinion are real year-one costs before anyone is paid for their time. | Milestone 0 |

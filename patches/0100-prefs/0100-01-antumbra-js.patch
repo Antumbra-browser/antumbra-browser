@@ -1,9 +1,9 @@
 diff --git a/browser/app/profile/antumbra.js b/browser/app/profile/antumbra.js
 new file mode 100644
-index 000000000000..8be996d697f0
+index 000000000000..2c16857818cf
 --- /dev/null
 +++ b/browser/app/profile/antumbra.js
-@@ -0,0 +1,69 @@
+@@ -0,0 +1,79 @@
 +/* This Source Code Form is subject to the terms of the Mozilla Public
 + * License, v. 2.0. If a copy of the MPL was not distributed with this
 + * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -63,6 +63,16 @@ index 000000000000..8be996d697f0
 +
 +/* --- Pocket off --- */
 +pref("extensions.pocket.enabled", false);
++
++/* --- Content recommendations (discovery stream) off --- */
++pref("browser.newtabpage.activity-stream.discoverystream.enabled", false);
++
++/* --- Private browsing page: Mozilla promotional content off --- */
++pref("browser.vpn_promo.enabled", false);
++pref("browser.promo.focus.enabled", false);
++pref("browser.promo.pin.enabled", false);
++pref("browser.promo.cookiebanners.enabled", false);
++pref("browser.search.separatePrivateDefault.ui.enabled", false);
 +
 +/* --- First run / welcome --- */
 +pref("browser.aboutwelcome.enabled", false);

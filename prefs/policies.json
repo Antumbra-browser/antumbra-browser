@@ -17,6 +17,10 @@
     "OverrideFirstRunPage": "",
     "DisableFeedbackCommands": true,
     "DisableSetDesktopBackground": false,
-    "DontCheckDefaultBrowser": true
+    "DontCheckDefaultBrowser": true,
+    "SearchEngines": {
+      "Default": "DuckDuckGo",
+      "DefaultPrivate": "DuckDuckGo"
+    }
   }
 }

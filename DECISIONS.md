@@ -487,6 +487,52 @@ The root cause is that Firefox's incremental build system tracks source timestam
 
 ---
 
+## 2026-09-30
+
+---
+
+### D15. BLOCKING BUG: 0000-branding patch is not reproducible from a clean checkout
+
+**Status.** This is a Milestone 1 blocker. The patch series is not reproducible from a clean Firefox tree.
+
+**Problem.**
+
+The `0000-branding` patch was generated with `git diff` without the `--binary` flag. Binary files (PNG, ICO, BMP, .car, and others) appear in the patch as lines of the form:
+
+```
+Binary files /dev/null and b/browser/branding/antumbra/... differ
+```
+
+`git apply` and `git apply --3way` cannot process this format. There is no binary content in the patch -- only the hash of the object that was staged. Running `scripts/apply-patches.sh` or `git apply` on a genuinely clean checkout will fail immediately on `Assets.car` (line 4).
+
+All builds since the branding work began have succeeded only because the branding files were never fully removed from the Firefox tree between sessions. `git clean -fd` removed the staged index entries but left the directory structure in place (the files had already been copied manually or survived prior clean attempts). The build appeared to work from a clean state; it did not.
+
+This means the patch series violates its own stated goal from D6 and ARCHITECTURE.md 3.1: that every change is an explicit, named patch and the build is reproducible from the repository state alone.
+
+**Consequence.**
+
+1. A developer following the documented bootstrap procedure (reset tree, run `scripts/apply-patches.sh`, build) cannot reproduce the build.
+2. The CI patch-apply check in ARCHITECTURE.md 10.3 cannot be meaningfully implemented until this is fixed.
+3. Any future developer who hard-resets the Firefox tree will have a broken build with no clear error message pointing at the patch.
+
+**Fix required before Milestone 1 ships.**
+
+Regenerate the `0000-branding` patch using `git format-patch --binary` or `git diff --binary` so the patch contains actual binary content in GIT binary patch format (`literal` or `delta` sections). Then prove reproducibility by:
+
+1. Hard-resetting the Firefox tree to the pinned ESR tag (`git checkout FIREFOX_153_3_0esr_RELEASE`).
+2. Removing all untracked files (`git clean -fdx`).
+3. Running `scripts/apply-patches.sh` with all four patches applied in order.
+4. Confirming the tree compiles to a working binary with a full cold build.
+
+Until that is done, the branding source files in `antumbra-browser/branding/antumbra/` also need to be kept in sync with the final patch content, because they are the only reliable way to reconstruct the Firefox tree. Two files in the branding source directory are currently stale and must be updated as part of this fix:
+
+- `branding/antumbra/content/jar.mn`: has `antumbra.jar:` format; correct format is `browser.jar:` with both the branding and the antumbra content sections.
+- `branding/antumbra/content/antumbra-content/welcome.js`: imports `chrome://antumbra/content/AntumbraMode.sys.mjs`; correct import is `resource://antumbra/AntumbraMode.sys.mjs`.
+
+**Affects:** `patches/0000-branding/`, `scripts/apply-patches.sh`, `branding/antumbra/`, all CI plans in ARCHITECTURE.md 10.3.
+
+---
+
 ## Still open
 
 Carried forward from ARCHITECTURE.md section 13. Not yet decided.

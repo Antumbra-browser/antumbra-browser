@@ -13,7 +13,7 @@ const { Services } = ChromeUtils.importESModule(
   "resource://gre/modules/Services.sys.mjs"
 );
 const { AntumbraMode } = ChromeUtils.importESModule(
-  "chrome://antumbra/content/AntumbraMode.sys.mjs"
+  "resource://antumbra/AntumbraMode.sys.mjs"
 );
 
 // --- State ---

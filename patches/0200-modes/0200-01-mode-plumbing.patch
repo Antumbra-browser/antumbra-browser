@@ -141,3 +141,16 @@ index d1d769ab0911..d9f1ad110836 100644
      "asrouter",
      "attribution",
      "backup",
+diff --git a/browser/components/antumbra/moz.build b/browser/components/antumbra/moz.build
+new file mode 100644
+index 000000000000..4e3a2b1f0000
+--- /dev/null
++++ b/browser/components/antumbra/moz.build
+@@ -0,0 +1,7 @@
++# This Source Code Form is subject to the terms of the Mozilla Public
++# License, v. 2.0. If a copy of the MPL was not distributed with this
++# file, You can obtain one at http://mozilla.org/MPL/2.0/.
++
++EXTRA_JS_MODULES.antumbra += [
++    "AntumbraMode.sys.mjs",
++]

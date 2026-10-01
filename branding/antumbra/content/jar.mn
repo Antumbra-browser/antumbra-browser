@@ -5,6 +5,7 @@
 browser.jar:
 % content branding %content/branding/ contentaccessible=yes
   content/branding/about.png
+  content/branding/aboutDialog.css
   content/branding/about-logo-private.png
   content/branding/about-logo-private@2x.png
   content/branding/about-logo.png

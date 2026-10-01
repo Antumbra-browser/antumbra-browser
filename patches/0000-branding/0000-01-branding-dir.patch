@@ -1,88 +1,59 @@
-diff --git a/browser/branding/antumbra/Assets.car b/browser/branding/antumbra/Assets.car
-new file mode 100644
-index 000000000000..e332d36a562d
-Binary files /dev/null and b/browser/branding/antumbra/Assets.car differ
 diff --git a/browser/branding/antumbra/PrivateBrowsing_150.png b/browser/branding/antumbra/PrivateBrowsing_150.png
 new file mode 100644
-index 000000000000..695e7189a437
-Binary files /dev/null and b/browser/branding/antumbra/PrivateBrowsing_150.png differ
+index 0000000000000000000000000000000000000000..695e7189a437630a387ab84f6551e57f9e3ddc6c
+GIT binary patch
+literal 301
+zcmeAS@N?(olHy`uVBq!ia0vp^(?FPm2}o{Eezp}zeera045_&F_ToWK1_q8J8-8~`
+z_;=Z=jib@;!jh^lyCNC_I9df3a&xo>a0qfO6yQ>HQWSAgbkS&W(r5t*0wo22;z~e4
+r5hswKQwLCR;1zSkI^b~2u1v;=z&$BfHd#9Z{m<a(>gTe~DWM4fDREM|
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/PrivateBrowsing_70.png b/browser/branding/antumbra/PrivateBrowsing_70.png
 new file mode 100644
-index 000000000000..04ba31009711
-Binary files /dev/null and b/browser/branding/antumbra/PrivateBrowsing_70.png differ
+index 0000000000000000000000000000000000000000..04ba31009711fdc078e404bd70592c2fd0632ae0
+GIT binary patch
+literal 144
+zcmeAS@N?(olHy`uVBq!ia0vp^ZXnFT1SJ3YlwJl>;hrvzAr-gYo_FMAVBlcc@Vh(V
+q|CVhZ6q`jORz07op-CRN8<ooZcmG?ya{@ps7(8A5T-G@yGywoEmnA9y
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/VisualElements_150.png b/browser/branding/antumbra/VisualElements_150.png
 new file mode 100644
-index 000000000000..695e7189a437
-Binary files /dev/null and b/browser/branding/antumbra/VisualElements_150.png differ
+index 0000000000000000000000000000000000000000..695e7189a437630a387ab84f6551e57f9e3ddc6c
+GIT binary patch
+literal 301
+zcmeAS@N?(olHy`uVBq!ia0vp^(?FPm2}o{Eezp}zeera045_&F_ToWK1_q8J8-8~`
+z_;=Z=jib@;!jh^lyCNC_I9df3a&xo>a0qfO6yQ>HQWSAgbkS&W(r5t*0wo22;z~e4
+r5hswKQwLCR;1zSkI^b~2u1v;=z&$BfHd#9Z{m<a(>gTe~DWM4fDREM|
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/VisualElements_70.png b/browser/branding/antumbra/VisualElements_70.png
 new file mode 100644
-index 000000000000..04ba31009711
-Binary files /dev/null and b/browser/branding/antumbra/VisualElements_70.png differ
-diff --git a/browser/branding/antumbra/background.png b/browser/branding/antumbra/background.png
-new file mode 100644
-index 000000000000..7727beacd691
-Binary files /dev/null and b/browser/branding/antumbra/background.png differ
+index 0000000000000000000000000000000000000000..04ba31009711fdc078e404bd70592c2fd0632ae0
+GIT binary patch
+literal 144
+zcmeAS@N?(olHy`uVBq!ia0vp^ZXnFT1SJ3YlwJl>;hrvzAr-gYo_FMAVBlcc@Vh(V
+q|CVhZ6q`jORz07op-CRN8<ooZcmG?ya{@ps7(8A5T-G@yGywoEmnA9y
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/branding.nsi b/browser/branding/antumbra/branding.nsi
 new file mode 100644
-index 000000000000..04d7e2fcce7c
+index 000000000000..43c04b1a5897
 --- /dev/null
 +++ b/browser/branding/antumbra/branding.nsi
-@@ -0,0 +1,55 @@
-+# This Source Code Form is subject to the terms of the Mozilla Public
-+# License, v. 2.0. If a copy of the MPL was not distributed with this
-+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
-+
-+# BrandFullNameInternal is used for some registry and file system values
-+# instead of BrandFullName and typically should not be modified.
-+!define BrandFullNameInternal "Antumbra"
-+!define BrandFullName         "Antumbra Browser"
-+!define CompanyName           "Antumbra Project"
-+!define URLInfoAbout          "https://antumbra.com"
-+!define HelpLink              "https://antumbra.com"
-+
-+!define URLStubDownloadX86 "https://antumbra.com/download"
-+!define URLStubDownloadAMD64 "https://antumbra.com/download"
-+!define URLStubDownloadAArch64 "https://antumbra.com/download"
-+!define URLManualDownload "https://antumbra.com/download"
-+!define URLSystemRequirements "https://antumbra.com"
-+!define Channel "release"
-+
-+!define CertNameDownload   "Antumbra Project"
-+!define CertIssuerDownload "DigiCert"
-+
-+!define PROFILE_CLEANUP_LABEL_TOP "35u"
-+!define PROFILE_CLEANUP_LABEL_LEFT "0"
-+!define PROFILE_CLEANUP_LABEL_WIDTH "100%"
-+!define PROFILE_CLEANUP_LABEL_HEIGHT "80u"
-+!define PROFILE_CLEANUP_LABEL_ALIGN "center"
-+!define PROFILE_CLEANUP_CHECKBOX_LEFT "center"
-+!define PROFILE_CLEANUP_CHECKBOX_WIDTH "100%"
-+!define PROFILE_CLEANUP_BUTTON_LEFT "center"
-+!define INSTALL_BLURB_TOP "137u"
-+!define INSTALL_BLURB_WIDTH "60u"
-+!define INSTALL_FOOTER_TOP "-48u"
-+!define INSTALL_FOOTER_WIDTH "250u"
-+!define INSTALL_INSTALLING_TOP "70u"
-+!define INSTALL_INSTALLING_LEFT "0"
-+!define INSTALL_INSTALLING_WIDTH "100%"
-+!define INSTALL_PROGRESS_BAR_TOP "112u"
-+!define INSTALL_PROGRESS_BAR_LEFT "20%"
-+!define INSTALL_PROGRESS_BAR_WIDTH "60%"
-+!define INSTALL_PROGRESS_BAR_HEIGHT "12u"
-+
-+!define PROFILE_CLEANUP_CHECKBOX_TOP_MARGIN "20u"
-+!define PROFILE_CLEANUP_BUTTON_TOP_MARGIN "20u"
-+!define PROFILE_CLEANUP_BUTTON_X_PADDING "40u"
-+!define PROFILE_CLEANUP_BUTTON_Y_PADDING "4u"
-+
-+!define INSTALL_HEADER_FONT_SIZE 28
-+!define INSTALL_HEADER_FONT_WEIGHT 400
-+!define INSTALL_INSTALLING_FONT_SIZE 28
-+!define INSTALL_INSTALLING_FONT_WEIGHT 400
-+
-+!define COMMON_TEXT_COLOR 0xF5F5F5
-+!define COMMON_BACKGROUND_COLOR 0x100D0B
-+!define INSTALL_INSTALLING_TEXT_COLOR 0xF5F5F5
+@@ -0,0 +1,4 @@
++; Antumbra NSIS branding strings
++!define BrandShortName "Antumbra"
++!define BrandFullName "Antumbra Browser"
++!define BrandingBackground "0x100D0B"
 diff --git a/browser/branding/antumbra/configure.sh b/browser/branding/antumbra/configure.sh
 new file mode 100644
 index 000000000000..f0bd2e3a9ba7
@@ -93,16 +64,52 @@ index 000000000000..f0bd2e3a9ba7
 +MOZ_MACBUNDLE_ID=com.antumbra.browser
 diff --git a/browser/branding/antumbra/content/about-logo-private.png b/browser/branding/antumbra/content/about-logo-private.png
 new file mode 100644
-index 000000000000..569142ae3777
-Binary files /dev/null and b/browser/branding/antumbra/content/about-logo-private.png differ
+index 0000000000000000000000000000000000000000..569142ae3777e26d874ee008afb80317d0da2608
+GIT binary patch
+literal 1521
+zcmeAS@N?(olHy`uVBq!ia0y~yU;;9k7&t&wwUqN(1_st0o-U3d6}R4A-N?(Jz{7m-
+z3rDBmjr~c^hlE1xUhZj_y}sIvq48Dj8CC}oMg{=}1{MYeMg|84vX}xut&|wy0JNP<
+zt6|z47-Sd~7#KJ}!O+0KKr*udsFfUjNY*tl{9tk*F90Fh7=d9(b{s&B_`upghVS9N
+zU{WAA01-w|7LG&T1suQ_AUhpGf{~*^c|bEHI6ucz<O>C$Pk@Pul7LWP*f;RS3jJKr
+eAkWC45WqaW-MZuSI@?(cK;Y@>=d#Wzp$P!Uzhs#J
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/about-logo-private@2x.png b/browser/branding/antumbra/content/about-logo-private@2x.png
 new file mode 100644
-index 000000000000..71282132e6e2
-Binary files /dev/null and b/browser/branding/antumbra/content/about-logo-private@2x.png differ
+index 0000000000000000000000000000000000000000..71282132e6e2314afb7e9c523eeed8dda07d3647
+GIT binary patch
+literal 4598
+zcmd^Bu}T9$5S_#bXJR0!gj8cC*w|QDu96so5Jc>?x3sYkT<p?FK+^gNf)<iOL;L|7
+z1;NT65F&_;jWdgPsJS!ygg}UaA$RP1vu|eJ-d$s(Ud?AqSt82U*2<ei8M(|*ke0vR
+z;nh7+@w!%C-r9eBemKt)Pfy&u294syVJkni*F3q+wcpz<qHf{k@-0QwnG>FoAWcw^
+zuo5mQ>xDolkT4Pvg!LwN#p;SGV!a3<o@uRelpN5umyRz4-3q9{F++JqxE^H3>8mZ7
+zoV*e><{N}RYyZ*g<ZZ2+7nA&eQt)AT3vx}&*aegTR$v5gl{3^~NPeiR$0$MV3RK|K
+zjGV>w*)ViR$sR1>I}f-?PdTiJl&Ucj&hVb)v*IB~VJ`1`N?YA9*<cyB4hb4b$Mz;;
+z-cYW#*xE<*p(&$c315SxyG4*-B)OIN#Swi*Hi`#M6DuBa6s9R~$pJwY6l4VNII-4=
+zZ-sK=SK?d2bRaDPieNV~_;`ydR%xE|00dbeZ73T*c4;HqSP54?>&4(wjKY9YSn-3?
+zMvww^P=cxf?BuorDzK71l4ta0Fxe^$&}3*yl0t;B_%2{+lacUfX#`=#LyjWI<>7&f
+zHnh57@@)R==eVAN<gUcL>PFJB-5Da*0ed<sZ3Js2u-XMb_^A;=So3=d`de44SP^6L
+cT`->_J6o!(Hh0$-?@qPJwMxBwwz6~d0ix!rTmS$7
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/about-logo.png b/browser/branding/antumbra/content/about-logo.png
 new file mode 100644
-index 000000000000..569142ae3777
-Binary files /dev/null and b/browser/branding/antumbra/content/about-logo.png differ
+index 0000000000000000000000000000000000000000..569142ae3777e26d874ee008afb80317d0da2608
+GIT binary patch
+literal 1521
+zcmeAS@N?(olHy`uVBq!ia0y~yU;;9k7&t&wwUqN(1_st0o-U3d6}R4A-N?(Jz{7m-
+z3rDBmjr~c^hlE1xUhZj_y}sIvq48Dj8CC}oMg{=}1{MYeMg|84vX}xut&|wy0JNP<
+zt6|z47-Sd~7#KJ}!O+0KKr*udsFfUjNY*tl{9tk*F90Fh7=d9(b{s&B_`upghVS9N
+zU{WAA01-w|7LG&T1suQ_AUhpGf{~*^c|bEHI6ucz<O>C$Pk@Pul7LWP*f;RS3jJKr
+eAkWC45WqaW-MZuSI@?(cK;Y@>=d#Wzp$P!Uzhs#J
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/about-logo.svg b/browser/branding/antumbra/content/about-logo.svg
 new file mode 100644
 index 000000000000..39b2a5e3efd9
@@ -117,8 +124,24 @@ index 000000000000..39b2a5e3efd9
 +</svg>
 diff --git a/browser/branding/antumbra/content/about-logo@2x.png b/browser/branding/antumbra/content/about-logo@2x.png
 new file mode 100644
-index 000000000000..71282132e6e2
-Binary files /dev/null and b/browser/branding/antumbra/content/about-logo@2x.png differ
+index 0000000000000000000000000000000000000000..71282132e6e2314afb7e9c523eeed8dda07d3647
+GIT binary patch
+literal 4598
+zcmd^Bu}T9$5S_#bXJR0!gj8cC*w|QDu96so5Jc>?x3sYkT<p?FK+^gNf)<iOL;L|7
+z1;NT65F&_;jWdgPsJS!ygg}UaA$RP1vu|eJ-d$s(Ud?AqSt82U*2<ei8M(|*ke0vR
+z;nh7+@w!%C-r9eBemKt)Pfy&u294syVJkni*F3q+wcpz<qHf{k@-0QwnG>FoAWcw^
+zuo5mQ>xDolkT4Pvg!LwN#p;SGV!a3<o@uRelpN5umyRz4-3q9{F++JqxE^H3>8mZ7
+zoV*e><{N}RYyZ*g<ZZ2+7nA&eQt)AT3vx}&*aegTR$v5gl{3^~NPeiR$0$MV3RK|K
+zjGV>w*)ViR$sR1>I}f-?PdTiJl&Ucj&hVb)v*IB~VJ`1`N?YA9*<cyB4hb4b$Mz;;
+z-cYW#*xE<*p(&$c315SxyG4*-B)OIN#Swi*Hi`#M6DuBa6s9R~$pJwY6l4VNII-4=
+zZ-sK=SK?d2bRaDPieNV~_;`ydR%xE|00dbeZ73T*c4;HqSP54?>&4(wjKY9YSn-3?
+zMvww^P=cxf?BuorDzK71l4ta0Fxe^$&}3*yl0t;B_%2{+lacUfX#`=#LyjWI<>7&f
+zHnh57@@)R==eVAN<gUcL>PFJB-5Da*0ed<sZ3Js2u-XMb_^A;=So3=d`de44SP^6L
+cT`->_J6o!(Hh0$-?@qPJwMxBwwz6~d0ix!rTmS$7
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/about-wordmark.svg b/browser/branding/antumbra/content/about-wordmark.svg
 new file mode 100644
 index 000000000000..f83c4b989d6e
@@ -130,578 +153,151 @@ index 000000000000..f83c4b989d6e
 +</svg>
 diff --git a/browser/branding/antumbra/content/about.png b/browser/branding/antumbra/content/about.png
 new file mode 100644
-index 000000000000..94aae9992a3c
-Binary files /dev/null and b/browser/branding/antumbra/content/about.png differ
-diff --git a/browser/branding/antumbra/content/antumbra-content/.gitkeep b/browser/branding/antumbra/content/antumbra-content/.gitkeep
+index 0000000000000000000000000000000000000000..94aae9992a3cfc9e59935404e0ba2e057da935cf
+GIT binary patch
+literal 713
+zcmeAS@N?(olHy`uVBq!ia0y~yVAKO)4kn<;ex(c%1_q`Ho-U3d6}R4A-pI+IAi#3)
+zyz2&*-~DecY-ic*&Gt;n;>NCY=EARL&zPE)a0IbXfTt*V2u`332X-mAI#7V!8$=j2
+zn<&CdDGP)ztR8|(G+ZYrDUgpBi8yvOP>6$AG?^&CznGSA06jtp#uf-4<|_$YH{Dpg
+VPwV@OMZhG=;OXk;vd$@?2>{pczGMIZ
+
+literal 0
+HcmV?d00001
+
+diff --git a/browser/branding/antumbra/content/aboutDialog.css b/browser/branding/antumbra/content/aboutDialog.css
 new file mode 100644
-index 000000000000..e69de29bb2d1
-diff --git a/browser/branding/antumbra/content/antumbra-content/dns-resolvers.json b/browser/branding/antumbra/content/antumbra-content/dns-resolvers.json
-new file mode 100644
-index 000000000000..069ab0fd7df5
+index 000000000000..f6806d8b41c7
 --- /dev/null
-+++ b/browser/branding/antumbra/content/antumbra-content/dns-resolvers.json
-@@ -0,0 +1,59 @@
-+{
-+  "_comment": "Antumbra DNS resolver list. Shown in the first-run wizard. Not Mozilla's TRR partner list. Edit requires DECISIONS.md note on reasoning (ARCHITECTURE.md 5.7).",
-+  "resolvers": [
-+    {
-+      "id": "quad9",
-+      "name": "Quad9",
-+      "url": "https://dns.quad9.net/dns-query",
-+      "description": "Non-profit. Switzerland. No logging of source IPs. Blocks known malware domains.",
-+      "jurisdiction": "Switzerland",
-+      "logs": false,
-+      "default": true
-+    },
-+    {
-+      "id": "mullvad",
-+      "name": "Mullvad",
-+      "url": "https://doh.mullvad.net/dns-query",
-+      "description": "Privacy-focused VPN provider. Sweden. No-log policy. No malware filtering.",
-+      "jurisdiction": "Sweden",
-+      "logs": false,
-+      "default": false
-+    },
-+    {
-+      "id": "adguard",
-+      "name": "AdGuard",
-+      "url": "https://dns.adguard-dns.com/dns-query",
-+      "description": "Independent. Cyprus. No logging. Blocks ads and trackers at the DNS level.",
-+      "jurisdiction": "Cyprus",
-+      "logs": false,
-+      "default": false
-+    },
-+    {
-+      "id": "cloudflare",
-+      "name": "Cloudflare 1.1.1.1",
-+      "url": "https://cloudflare-dns.com/dns-query",
-+      "description": "US-based. Largest CDN provider. Logs anonymised queries for 24 hours per privacy policy.",
-+      "jurisdiction": "United States",
-+      "logs": true,
-+      "default": false
-+    },
-+    {
-+      "id": "system",
-+      "name": "Use my system resolver",
-+      "url": "",
-+      "description": "Uses your network's default DNS. Right choice if you trust your ISP, run Pi-hole, or use a VPN with its own DNS.",
-+      "jurisdiction": "varies",
-+      "logs": null,
-+      "default": false
-+    },
-+    {
-+      "id": "custom",
-+      "name": "Custom URL",
-+      "url": "",
-+      "description": "Enter a DNS-over-HTTPS URL. For people who run their own resolver.",
-+      "jurisdiction": "custom",
-+      "logs": null,
-+      "default": false
-+    }
-+  ]
-+}
-diff --git a/browser/branding/antumbra/content/antumbra-content/welcome.css b/browser/branding/antumbra/content/antumbra-content/welcome.css
-new file mode 100644
-index 000000000000..13e14e41bdea
---- /dev/null
-+++ b/browser/branding/antumbra/content/antumbra-content/welcome.css
-@@ -0,0 +1,150 @@
++++ b/browser/branding/antumbra/content/aboutDialog.css
+@@ -0,0 +1,35 @@
 +/* This Source Code Form is subject to the terms of the Mozilla Public
 + * License, v. 2.0. If a copy of the MPL was not distributed with this
 + * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 +
-+:root {
-+  --void:    #0B0D10;
-+  --umbra:   #13181F;
-+  --penumbra:#222933;
-+  --ash:     #8B95A3;
-+  --daylight:#E8ECF1;
-+  --corona:  #FFB020;
-+  --relay:   #7C5CFF;
-+  color-scheme: dark;
++@media not ((prefers-contrast) and (prefers-color-scheme: light)) {
++  #aboutDialogContainer {
++    background-color: #0f1923;
++    color: #e8ecf1;
++    color-scheme: dark;
++  }
++
++  #bottomBox {
++    background-color: hsla(210, 30%, 8%, 0.5);
++  }
++
++  #trademark {
++    color: #8a9bb0;
++  }
 +}
 +
-+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-+
-+body {
-+  background: var(--void);
-+  color: var(--daylight);
-+  font-family: system-ui, sans-serif;
-+  font-size: 15px;
-+  line-height: 1.5;
-+  min-height: 100vh;
-+  display: flex;
-+  align-items: center;
-+  justify-content: center;
++#rightBox {
++  background-size: auto 44px;
++  margin-inline: 30px;
++  padding-top: 64px;
 +}
 +
-+.wizard {
-+  width: min(520px, 94vw);
-+  background: var(--umbra);
-+  border: 1px solid var(--penumbra);
-+  border-radius: 12px;
-+  overflow: hidden;
++#bottomBox {
++  padding: 15px 10px;
 +}
 +
-+.screen { display: none; padding: 36px 40px 28px; }
-+.screen.active { display: block; }
-+
-+.logo { text-align: center; margin-bottom: 24px; }
-+.logo svg { width: 56px; height: 56px; }
-+
-+h1 { font-size: 1.45rem; font-weight: 600; margin-bottom: 8px; }
-+h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
-+.subtitle { color: var(--ash); margin-bottom: 28px; font-size: 0.9rem; }
-+
-+.mode-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-+
-+.mode-card {
-+  border: 2px solid var(--penumbra);
-+  border-radius: 8px;
-+  padding: 14px 16px;
-+  cursor: pointer;
-+  transition: border-color 0.15s;
-+}
-+.mode-card:hover { border-color: var(--ash); }
-+.mode-card.selected { border-color: var(--corona); }
-+.mode-card[data-mode="blackout"].selected { border-color: #555; }
-+
-+.mode-card .name { font-weight: 600; margin-bottom: 3px; }
-+.mode-card .desc { font-size: 0.85rem; color: var(--ash); }
-+.mode-card .tradeoff { font-size: 0.8rem; color: var(--ash); margin-top: 4px; font-style: italic; }
-+
-+.resolver-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-+
-+.resolver-item {
-+  display: flex;
-+  align-items: flex-start;
-+  gap: 12px;
-+  border: 2px solid var(--penumbra);
-+  border-radius: 8px;
-+  padding: 12px 14px;
-+  cursor: pointer;
-+}
-+.resolver-item:hover { border-color: var(--ash); }
-+.resolver-item.selected { border-color: var(--corona); }
-+.resolver-item input[type=radio] { margin-top: 3px; accent-color: var(--corona); }
-+.resolver-item .r-name { font-weight: 600; font-size: 0.9rem; }
-+.resolver-item .r-desc { font-size: 0.82rem; color: var(--ash); margin-top: 2px; }
-+
-+#custom-url-row { margin-top: 6px; }
-+#custom-url-row input {
-+  width: 100%;
-+  background: var(--penumbra);
-+  border: 1px solid var(--ash);
-+  border-radius: 6px;
-+  color: var(--daylight);
-+  padding: 7px 10px;
-+  font-size: 0.9rem;
-+}
-+
-+.tab-options { display: flex; gap: 12px; margin-bottom: 28px; }
-+.tab-option {
-+  flex: 1;
-+  border: 2px solid var(--penumbra);
-+  border-radius: 8px;
-+  padding: 16px;
-+  cursor: pointer;
++#trademark {
++  font-size: xx-small;
 +  text-align: center;
-+}
-+.tab-option:hover { border-color: var(--ash); }
-+.tab-option.selected { border-color: var(--corona); }
-+.tab-option .icon { font-size: 1.6rem; margin-bottom: 6px; }
-+.tab-option .label { font-weight: 600; font-size: 0.9rem; }
-+
-+.pw-box {
-+  background: var(--penumbra);
-+  border-radius: 8px;
-+  padding: 16px;
-+  margin-bottom: 20px;
-+  font-size: 0.88rem;
-+  color: var(--ash);
-+}
-+.pw-box strong { color: var(--daylight); }
-+
-+.disclosure-box {
-+  background: var(--penumbra);
-+  border-radius: 8px;
-+  padding: 14px 16px;
-+  font-size: 0.82rem;
-+  color: var(--ash);
-+  margin-bottom: 20px;
-+}
-+.disclosure-box p + p { margin-top: 8px; }
-+
-+.actions {
-+  display: flex;
-+  justify-content: space-between;
-+  align-items: center;
-+  padding-top: 16px;
-+  border-top: 1px solid var(--penumbra);
-+}
-+
-+.btn {
-+  border: none;
-+  border-radius: 6px;
-+  padding: 9px 20px;
-+  font-size: 0.9rem;
-+  font-weight: 600;
-+  cursor: pointer;
-+}
-+.btn-primary { background: var(--corona); color: var(--void); }
-+.btn-primary:hover { background: #ffc040; }
-+.btn-secondary { background: transparent; color: var(--ash); border: 1px solid var(--penumbra); }
-+.btn-secondary:hover { color: var(--daylight); border-color: var(--ash); }
-+
-+.step-dots { display: flex; gap: 6px; }
-+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--penumbra); }
-+.dot.active { background: var(--corona); }
-diff --git a/browser/branding/antumbra/content/antumbra-content/welcome.html b/browser/branding/antumbra/content/antumbra-content/welcome.html
-new file mode 100644
-index 000000000000..810a79278b78
---- /dev/null
-+++ b/browser/branding/antumbra/content/antumbra-content/welcome.html
-@@ -0,0 +1,138 @@
-+<!DOCTYPE html>
-+<!-- This Source Code Form is subject to the terms of the Mozilla Public
-+   - License, v. 2.0. If a copy of the MPL was not distributed with this
-+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
-+<html lang="en">
-+<head>
-+  <meta charset="UTF-8">
-+  <meta name="viewport" content="width=device-width, initial-scale=1">
-+  <title>Welcome to Antumbra</title>
-+  <link rel="stylesheet" href="chrome://antumbra/content/welcome.css">
-+</head>
-+<body>
-+<div class="wizard">
-+
-+  <!-- Screen 1: Protection mode picker -->
-+  <div class="screen active" id="screen-mode">
-+    <div class="logo">
-+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-+        <circle cx="32" cy="32" r="30" fill="none" stroke="#FFB020" stroke-width="5" opacity="0.9"/>
-+        <circle cx="32" cy="32" r="20" fill="#0B0D10"/>
-+      </svg>
-+    </div>
-+    <h1>Welcome to Antumbra</h1>
-+    <p class="subtitle">Choose your protection level. You can change this any time.</p>
-+    <div class="mode-cards">
-+      <div class="mode-card selected" data-mode="standard" tabindex="0">
-+        <div class="name">Standard</div>
-+        <div class="desc">Strict tracking protection, ad blocking, cookie banner rejection. Works with nearly every site.</div>
-+        <div class="tradeoff">Good for everyday browsing.</div>
-+      </div>
-+      <div class="mode-card" data-mode="strict" tabindex="0">
-+        <div class="name">Strict</div>
-+        <div class="desc">Everything in Standard, plus fingerprinting protection and aggressive parameter stripping. Occasionally breaks logins on complex sites.</div>
-+        <div class="tradeoff">Better privacy, some site breakage possible.</div>
-+      </div>
-+      <div class="mode-card" data-mode="blackout" tabindex="0">
-+        <div class="name">Blackout</div>
-+        <div class="desc">Maximum hardening. Resist Fingerprinting on, WebRTC restricted, pure-black chrome. Breaks more sites intentionally.</div>
-+        <div class="tradeoff">Highest privacy, highest breakage. Use per-site relaxation when needed.</div>
-+      </div>
-+    </div>
-+    <div class="actions">
-+      <div class="step-dots">
-+        <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-+      </div>
-+      <button class="btn btn-primary" id="mode-next">Next</button>
-+    </div>
-+  </div>
-+
-+  <!-- Screen 2: DNS resolver picker -->
-+  <div class="screen" id="screen-dns">
-+    <h1>Encrypted DNS</h1>
-+    <p class="subtitle">Antumbra encrypts DNS queries so your internet provider cannot see what sites you visit by name. Choose a resolver.</p>
-+    <div class="resolver-list" id="resolver-list"><!-- populated by JS --></div>
-+    <div id="custom-url-row" style="display:none">
-+      <input type="url" id="custom-url" placeholder="https://your-resolver/dns-query">
-+    </div>
-+    <div class="actions">
-+      <div class="step-dots">
-+        <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-+      </div>
-+      <div style="display:flex;gap:10px">
-+        <button class="btn btn-secondary" id="dns-back">Back</button>
-+        <button class="btn btn-primary" id="dns-next">Next</button>
-+      </div>
-+    </div>
-+  </div>
-+
-+  <!-- Screen 3: Tab orientation -->
-+  <div class="screen" id="screen-tabs">
-+    <h1>Tab layout</h1>
-+    <p class="subtitle">Where would you like your tabs?</p>
-+    <div class="tab-options">
-+      <div class="tab-option selected" data-tabs="vertical" tabindex="0">
-+        <div class="icon">&#9707;</div>
-+        <div class="label">Vertical (left sidebar)</div>
-+      </div>
-+      <div class="tab-option" data-tabs="horizontal" tabindex="0">
-+        <div class="icon">&#9636;</div>
-+        <div class="label">Horizontal (top bar)</div>
-+      </div>
-+    </div>
-+    <div class="actions">
-+      <div class="step-dots">
-+        <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
-+      </div>
-+      <div style="display:flex;gap:10px">
-+        <button class="btn btn-secondary" id="tabs-back">Back</button>
-+        <button class="btn btn-primary" id="tabs-next">Next</button>
-+      </div>
-+    </div>
-+  </div>
-+
-+  <!-- Screen 4: Primary password offer -->
-+  <div class="screen" id="screen-password">
-+    <h1>Password vault</h1>
-+    <p class="subtitle">Antumbra includes a built-in password manager.</p>
-+    <div class="pw-box">
-+      <p><strong>Set a primary password</strong> to encrypt your saved passwords with a key only you know.</p>
-+      <p style="margin-top:8px">Without one, your saved passwords are encrypted with a key stored next to them. Anyone with access to your profile can read them.</p>
-+    </div>
-+    <p style="font-size:0.85rem;color:var(--ash);margin-bottom:20px">You can set a primary password later in Settings &rsaquo; Privacy &amp; Security &rsaquo; Passwords.</p>
-+    <div class="actions">
-+      <div class="step-dots">
-+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
-+      </div>
-+      <div style="display:flex;gap:10px">
-+        <button class="btn btn-secondary" id="pw-back">Back</button>
-+        <button class="btn btn-primary" id="pw-next">Got it, continue</button>
-+      </div>
-+    </div>
-+  </div>
-+
-+  <!-- Screen 5: Update method + network disclosures -->
-+  <div class="screen" id="screen-updates">
-+    <h1>How updates work</h1>
-+    <p class="subtitle">Antumbra does not yet have a built-in updater. Updates are delivered through your package manager or as direct downloads from GitHub Releases.</p>
-+    <div class="disclosure-box">
-+      <p><strong>Two background connections you should know about:</strong></p>
-+      <p><strong>Remote Settings</strong> (Mozilla): periodically downloads certificate revocation data, tracking protection lists, and cookie banner rejection rules. No data is uploaded. Required for security and for cookie banner blocking to work.</p>
-+      <p><strong>Safe Browsing</strong> (Google): local malware and phishing lists are checked against your visits. The per-download remote lookup that sends URLs to Google is disabled. Only local list checks run.</p>
-+      <p>Both are disclosed in the privacy policy. Neither is telemetry.</p>
-+    </div>
-+    <div class="actions">
-+      <div class="step-dots">
-+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
-+      </div>
-+      <div style="display:flex;gap:10px">
-+        <button class="btn btn-secondary" id="updates-back">Back</button>
-+        <button class="btn btn-primary" id="updates-finish">Start browsing</button>
-+      </div>
-+    </div>
-+  </div>
-+
-+</div>
-+<script src="chrome://antumbra/content/welcome.js"></script>
-+</body>
-+</html>
-diff --git a/browser/branding/antumbra/content/antumbra-content/welcome.js b/browser/branding/antumbra/content/antumbra-content/welcome.js
-new file mode 100644
-index 000000000000..3114b1d25c42
---- /dev/null
-+++ b/browser/branding/antumbra/content/antumbra-content/welcome.js
-@@ -0,0 +1,164 @@
-+/* This Source Code Form is subject to the terms of the Mozilla Public
-+ * License, v. 2.0. If a copy of the MPL was not distributed with this
-+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-+
-+/* Antumbra first-run wizard controller.
-+ * Runs in a privileged chrome page (chrome://antumbra/content/welcome.html).
-+ * Writes user choices to prefs via Services.prefs and closes.
-+ */
-+
-+"use strict";
-+
-+const { Services } = ChromeUtils.importESModule(
-+  "resource://gre/modules/Services.sys.mjs"
-+);
-+const { AntumbraMode } = ChromeUtils.importESModule(
-+  "resource://antumbra/AntumbraMode.sys.mjs"
-+);
-+
-+// --- State ---
-+let selectedMode = "standard";
-+let selectedResolver = null;
-+let selectedTabs = "vertical";
-+let resolvers = [];
-+
-+// --- Screen navigation ---
-+const screens = ["screen-mode", "screen-dns", "screen-tabs", "screen-password", "screen-updates"];
-+let currentScreen = 0;
-+
-+function showScreen(idx) {
-+  screens.forEach((id, i) => {
-+    document.getElementById(id).classList.toggle("active", i === idx);
-+  });
-+  currentScreen = idx;
-+}
-+
-+// --- Mode picker ---
-+document.querySelectorAll(".mode-card").forEach(card => {
-+  card.addEventListener("click", () => {
-+    document.querySelectorAll(".mode-card").forEach(c => c.classList.remove("selected"));
-+    card.classList.add("selected");
-+    selectedMode = card.dataset.mode;
-+  });
-+  card.addEventListener("keydown", e => {
-+    if (e.key === "Enter" || e.key === " ") card.click();
-+  });
-+});
-+
-+document.getElementById("mode-next").addEventListener("click", () => showScreen(1));
-+
-+// --- DNS resolver picker ---
-+async function loadResolvers() {
-+  try {
-+    const resp = await fetch("chrome://antumbra/content/dns-resolvers.json");
-+    const data = await resp.json();
-+    resolvers = data.resolvers;
-+  } catch {
-+    // Fallback: Quad9 only.
-+    resolvers = [{
-+      id: "quad9", name: "Quad9",
-+      url: "https://dns.quad9.net/dns-query",
-+      description: "Non-profit. Switzerland. No logging of source IPs.",
-+      default: true
-+    }];
-+  }
-+
-+  const list = document.getElementById("resolver-list");
-+  list.innerHTML = "";
-+  resolvers.forEach(r => {
-+    const item = document.createElement("div");
-+    item.className = "resolver-item" + (r.default ? " selected" : "");
-+    item.dataset.id = r.id;
-+    item.innerHTML = `
-+      <input type="radio" name="resolver" value="${r.id}" ${r.default ? "checked" : ""}>
-+      <div>
-+        <div class="r-name">${r.name}</div>
-+        <div class="r-desc">${r.description}</div>
-+      </div>`;
-+    item.addEventListener("click", () => {
-+      document.querySelectorAll(".resolver-item").forEach(el => el.classList.remove("selected"));
-+      item.classList.add("selected");
-+      item.querySelector("input").checked = true;
-+      selectedResolver = r;
-+      document.getElementById("custom-url-row").style.display =
-+        r.id === "custom" ? "block" : "none";
-+    });
-+    list.appendChild(item);
-+    if (r.default) selectedResolver = r;
-+  });
-+}
-+
-+loadResolvers();
-+
-+document.getElementById("dns-back").addEventListener("click", () => showScreen(0));
-+document.getElementById("dns-next").addEventListener("click", () => showScreen(2));
-+
-+// --- Tab layout ---
-+document.querySelectorAll(".tab-option").forEach(opt => {
-+  opt.addEventListener("click", () => {
-+    document.querySelectorAll(".tab-option").forEach(o => o.classList.remove("selected"));
-+    opt.classList.add("selected");
-+    selectedTabs = opt.dataset.tabs;
-+  });
-+});
-+
-+document.getElementById("tabs-back").addEventListener("click", () => showScreen(1));
-+document.getElementById("tabs-next").addEventListener("click", () => showScreen(3));
-+
-+// --- Password screen ---
-+document.getElementById("pw-back").addEventListener("click", () => showScreen(2));
-+document.getElementById("pw-next").addEventListener("click", () => showScreen(4));
-+
-+// --- Updates screen ---
-+document.getElementById("updates-back").addEventListener("click", () => showScreen(3));
-+document.getElementById("updates-finish").addEventListener("click", applyChoicesAndClose);
-+
-+// --- Apply all choices ---
-+function applyChoicesAndClose() {
-+  // 1. Protection mode
-+  try {
-+    AntumbraMode.applyMode(selectedMode);
-+  } catch (e) {
-+    console.error("AntumbraMode.applyMode failed:", e);
-+  }
-+
-+  // 2. DNS resolver
-+  if (selectedResolver) {
-+    if (selectedResolver.id === "system") {
-+      // System resolver: disable TRR (mode 0).
-+      Services.prefs.setIntPref("network.trr.mode", 0);
-+    } else if (selectedResolver.id === "custom") {
-+      const url = document.getElementById("custom-url").value.trim();
-+      if (url) {
-+        Services.prefs.setCharPref("network.trr.uri", url);
-+        Services.prefs.setCharPref("network.trr.custom_uri", url);
-+        Services.prefs.setIntPref("network.trr.mode", 2);
-+      }
-+    } else if (selectedResolver.url) {
-+      Services.prefs.setCharPref("network.trr.uri", selectedResolver.url);
-+      Services.prefs.setCharPref("network.trr.custom_uri", selectedResolver.url);
-+      Services.prefs.setIntPref("network.trr.mode", 2);
-+    }
-+  }
-+
-+  // 3. Tab layout
-+  try {
-+    // sidebar.verticalTabs may not exist in all ESR 153 builds (ARCHITECTURE.md 6.8).
-+    if (Services.prefs.getPrefType("sidebar.verticalTabs") !== Services.prefs.PREF_INVALID) {
-+      Services.prefs.setBoolPref("sidebar.verticalTabs", selectedTabs === "vertical");
-+    }
-+    if (Services.prefs.getPrefType("sidebar.revamp") !== Services.prefs.PREF_INVALID) {
-+      Services.prefs.setBoolPref("sidebar.revamp", selectedTabs === "vertical");
-+    }
-+  } catch (e) {
-+    console.warn("sidebar prefs not available in this build:", e);
-+  }
-+
-+  // 4. Mark first run complete so the wizard does not re-open.
-+  Services.prefs.setBoolPref("antumbra.firstrun.complete", true);
-+  // Clear the welcome URL so subsequent new tabs go to about:newtab.
-+  Services.prefs.setCharPref("startup.homepage_welcome_url", "");
-+
-+  // 5. Close this tab.
-+  window.close();
++  margin-block: 10px;
 +}
 diff --git a/browser/branding/antumbra/content/default128.png b/browser/branding/antumbra/content/default128.png
 new file mode 100644
-index 000000000000..b231b7707d65
-Binary files /dev/null and b/browser/branding/antumbra/content/default128.png differ
+index 0000000000000000000000000000000000000000..b231b7707d651624135c34167edfe050f2816394
+GIT binary patch
+literal 269
+zcmeAS@N?(olHy`uVBq!ia0vp^4Is?H1SEZ8zRdwrS3F%DLn>~)y||H=L4k+);1`Zg
+z!5jONoDYdDvv|3;Vg0+CTw(didafWXKv2U7GD3iXfr-I^fq{d8fssLhfq{i=L7<T!
+h(4bE(L+h9WHn6qs_0Wj?{6+?3w5O||%Q~loCIEWSDRKY+
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/default16.png b/browser/branding/antumbra/content/default16.png
 new file mode 100644
-index 000000000000..84dfee4318fe
-Binary files /dev/null and b/browser/branding/antumbra/content/default16.png differ
+index 0000000000000000000000000000000000000000..84dfee4318fe77d15f0dc1bec2de71dbd308c20b
+GIT binary patch
+literal 87
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!61SBU+%rFB|a-J@ZAr-fhf9!W`R5`+M<jx)@
+kmqmfRi>272m_0cd{H429Ejahw1gd24boFyt=akR{06~ft5&!@I
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/default22.png b/browser/branding/antumbra/content/default22.png
 new file mode 100644
-index 000000000000..b30477630b44
-Binary files /dev/null and b/browser/branding/antumbra/content/default22.png differ
+index 0000000000000000000000000000000000000000..b30477630b44c260d09708d429a5ee4c12d33d4e
+GIT binary patch
+literal 92
+zcmeAS@N?(olHy`uVBq!ia0vp^Vj#@H1SGw${mubW%APKcAr-fhf9!W`bUMOt<jx+Z
+pl*NI{ZoLwwNmn{1X0fz#FzhhAmdovxlMPhP;OXk;vd$@?2>>hY8lnII
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/default24.png b/browser/branding/antumbra/content/default24.png
 new file mode 100644
-index 000000000000..e335e701c214
-Binary files /dev/null and b/browser/branding/antumbra/content/default24.png differ
+index 0000000000000000000000000000000000000000..e335e701c214e531e5005ca68e2b1c67dd07cfe6
+GIT binary patch
+literal 94
+zcmeAS@N?(olHy`uVBq!ia0vp^5+KaM1SIoCSFHz9s-7;6Ar-fhf9!W`)aqdD*jdS{
+q;j);mSIQ*o!U{(qBc^#p6T{*?pIDE`Zd?G=z~JfX=d#Wzp$PyoGaIM?
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/default256.png b/browser/branding/antumbra/content/default256.png
 new file mode 100644
-index 000000000000..38df2266324f
-Binary files /dev/null and b/browser/branding/antumbra/content/default256.png differ
+index 0000000000000000000000000000000000000000..38df2266324fcfc9cf0e6d662ba1e3675206a2f6
+GIT binary patch
+literal 585
+zcmeAS@N?(olHy`uVBq!ia0y~yU<5K58911L)MWvCLk0#W0Z$jlkcwMxFCXM&P!M1~
+z_`5rS^V|PT&gc1b6qqNoF-3pR=?KkF*5goNU{PRTVPIllY+!I;P+$;X;Gi<sfq}_^
+zp^r9Z!(0vW!vk&_dZU4X1&nCv4GsqejsxP<4t@s41NsadSAQ>^A<o1lZN~rvp00i_
+I>zopr0Kua_EC2ui
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/default32.png b/browser/branding/antumbra/content/default32.png
 new file mode 100644
-index 000000000000..760fbbbb011f
-Binary files /dev/null and b/browser/branding/antumbra/content/default32.png differ
+index 0000000000000000000000000000000000000000..760fbbbb011ff2be1bf1ee4800b146ecd5471b0e
+GIT binary patch
+literal 106
+zcmeAS@N?(olHy`uVBq!ia0vp^3LwnE1SJ1Ryj={W3_V>OLn>}1|Jd)?xU7S*V`n96
+rMvI%S#MXo>O@Z8~j3to{!7L1X)j3}dy%jMAYG&|s^>bP0l+XkK*ytb7
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/default48.png b/browser/branding/antumbra/content/default48.png
 new file mode 100644
-index 000000000000..9f5358b0bb05
-Binary files /dev/null and b/browser/branding/antumbra/content/default48.png differ
+index 0000000000000000000000000000000000000000..9f5358b0bb05e199b503d0bace4de3a267797208
+GIT binary patch
+literal 125
+zcmeAS@N?(olHy`uVBq!ia0vp^1|ZDA1SD@H<Xr$#E}kxqAr-gYo?FPvpdi3<@Ow*(
+z(2MwsivEHf!js?pT3KBd@>Q<5l?500A}<okY#2E2@K(PCUO@90JYD@<);T3K0RXOg
+BATR&`
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/default64.png b/browser/branding/antumbra/content/default64.png
 new file mode 100644
-index 000000000000..38353178c130
-Binary files /dev/null and b/browser/branding/antumbra/content/default64.png differ
+index 0000000000000000000000000000000000000000..38353178c13015b6bbf924b26436ad247e45ca45
+GIT binary patch
+literal 144
+zcmeAS@N?(olHy`uVBq!ia0vp^4j|0I1SD0tpLGJMa8DP<kcwMx&mZJuP~c%X_{Y_Q
+z^X324_AF_3=H0A5ca1Mzt$)kM3sgxoP+%9h%gl5~VWD$7?@W*`Pgg&ebxsLQ0Fyr)
+Ap8x;=
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/content/firefox-wordmark.svg b/browser/branding/antumbra/content/firefox-wordmark.svg
 new file mode 100644
 index 000000000000..f83c4b989d6e
@@ -713,7 +309,7 @@ index 000000000000..f83c4b989d6e
 +</svg>
 diff --git a/browser/branding/antumbra/content/moz.build b/browser/branding/antumbra/content/moz.build
 new file mode 100644
-index 000000000000..4476aa1bb7f2
+index 000000000000..fb1f44e7bc47
 --- /dev/null
 +++ b/browser/branding/antumbra/content/moz.build
 @@ -0,0 +1,15 @@
@@ -724,66 +320,42 @@ index 000000000000..4476aa1bb7f2
 +JAR_MANIFESTS += ["jar.mn"]
 +
 +FINAL_TARGET_FILES.browser.chrome.branding += [
++    "about-logo.png",
++    "about-logo@2x.png",
++    "about-logo.svg",
 +    "about-logo-private.png",
 +    "about-logo-private@2x.png",
-+    "about-logo.png",
-+    "about-logo.svg",
-+    "about-logo@2x.png",
 +    "about-wordmark.svg",
 +    "firefox-wordmark.svg",
 +]
-diff --git a/browser/branding/antumbra/default128.png b/browser/branding/antumbra/default128.png
-new file mode 100644
-index 000000000000..8fe085c56ffc
-Binary files /dev/null and b/browser/branding/antumbra/default128.png differ
-diff --git a/browser/branding/antumbra/default16.png b/browser/branding/antumbra/default16.png
-new file mode 100644
-index 000000000000..e01114ba2bb5
-Binary files /dev/null and b/browser/branding/antumbra/default16.png differ
-diff --git a/browser/branding/antumbra/default22.png b/browser/branding/antumbra/default22.png
-new file mode 100644
-index 000000000000..0527dfd563cb
-Binary files /dev/null and b/browser/branding/antumbra/default22.png differ
-diff --git a/browser/branding/antumbra/default24.png b/browser/branding/antumbra/default24.png
-new file mode 100644
-index 000000000000..019d020fde05
-Binary files /dev/null and b/browser/branding/antumbra/default24.png differ
-diff --git a/browser/branding/antumbra/default256.png b/browser/branding/antumbra/default256.png
-new file mode 100644
-index 000000000000..d0d8bd01cc1a
-Binary files /dev/null and b/browser/branding/antumbra/default256.png differ
-diff --git a/browser/branding/antumbra/default32.png b/browser/branding/antumbra/default32.png
-new file mode 100644
-index 000000000000..c0986eae9367
-Binary files /dev/null and b/browser/branding/antumbra/default32.png differ
-diff --git a/browser/branding/antumbra/default48.png b/browser/branding/antumbra/default48.png
-new file mode 100644
-index 000000000000..1980ffb35c80
-Binary files /dev/null and b/browser/branding/antumbra/default48.png differ
-diff --git a/browser/branding/antumbra/default64.png b/browser/branding/antumbra/default64.png
-new file mode 100644
-index 000000000000..551c98d44431
-Binary files /dev/null and b/browser/branding/antumbra/default64.png differ
-diff --git a/browser/branding/antumbra/disk.icns b/browser/branding/antumbra/disk.icns
-new file mode 100644
-index 000000000000..323c8a8a69a6
-Binary files /dev/null and b/browser/branding/antumbra/disk.icns differ
-diff --git a/browser/branding/antumbra/document.icns b/browser/branding/antumbra/document.icns
-new file mode 100644
-index 000000000000..8cb0f7f9dc32
-Binary files /dev/null and b/browser/branding/antumbra/document.icns differ
 diff --git a/browser/branding/antumbra/document.ico b/browser/branding/antumbra/document.ico
 new file mode 100644
-index 000000000000..ab31275ca2ed
-Binary files /dev/null and b/browser/branding/antumbra/document.ico differ
+index 0000000000000000000000000000000000000000..ab31275ca2ededa390dbc4f02c18b94d51bb1520
+GIT binary patch
+literal 372
+zcmZQzU}Rus5D;Jh(h>~e3=9lrK&+qu;b#Hay+CYW0O8jH+24V<Gr-TCmrIHZ$mI3(
+za0vp^Kob}QIGBLsgozm-Gvqv7978H@CI8s(*r;-Z;mDmmOfHK8c^6BuMKODFF!)P%
+zt6FgGxd~Ls;OXk;vd$@?35&4`KxqZAv414qE(UT8k&Io|!Pv30k~O2nO;=)T!j+~#
+zZdAsSNQYn+2EOW?FNfZW7y~uqvkB-$1_Q87HxlwL068uYo8F#V$jhK0z;f_=ON-Ep
+q_=}4Ef*rz>-~3uxT^90HuDF#27x*GC63T2CIPdUQzXe{%mIDBbs#+HS
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/document_pdf.ico b/browser/branding/antumbra/document_pdf.ico
 new file mode 100644
-index 000000000000..ab31275ca2ed
-Binary files /dev/null and b/browser/branding/antumbra/document_pdf.ico differ
-diff --git a/browser/branding/antumbra/dsstore b/browser/branding/antumbra/dsstore
-new file mode 100644
-index 000000000000..b32056cc5616
-Binary files /dev/null and b/browser/branding/antumbra/dsstore differ
+index 0000000000000000000000000000000000000000..ab31275ca2ededa390dbc4f02c18b94d51bb1520
+GIT binary patch
+literal 372
+zcmZQzU}Rus5D;Jh(h>~e3=9lrK&+qu;b#Hay+CYW0O8jH+24V<Gr-TCmrIHZ$mI3(
+za0vp^Kob}QIGBLsgozm-Gvqv7978H@CI8s(*r;-Z;mDmmOfHK8c^6BuMKODFF!)P%
+zt6FgGxd~Ls;OXk;vd$@?35&4`KxqZAv414qE(UT8k&Io|!Pv30k~O2nO;=)T!j+~#
+zZdAsSNQYn+2EOW?FNfZW7y~uqvkB-$1_Q87HxlwL068uYo8F#V$jhK0z;f_=ON-Ep
+q_=}4Ef*rz>-~3uxT^90HuDF#27x*GC63T2CIPdUQzXe{%mIDBbs#+HS
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/firefox.VisualElementsManifest.xml b/browser/branding/antumbra/firefox.VisualElementsManifest.xml
 new file mode 100644
 index 000000000000..0a4807ba6790
@@ -798,18 +370,44 @@ index 000000000000..0a4807ba6790
 +    Square70x70Logo="VisualElements\VisualElements_70.png"
 +    ForegroundText="light"/>
 +</Application>
-diff --git a/browser/branding/antumbra/firefox.icns b/browser/branding/antumbra/firefox.icns
-new file mode 100644
-index 000000000000..d820967d9ebb
-Binary files /dev/null and b/browser/branding/antumbra/firefox.icns differ
 diff --git a/browser/branding/antumbra/firefox.ico b/browser/branding/antumbra/firefox.ico
 new file mode 100644
-index 000000000000..4ad22b0b4b36
-Binary files /dev/null and b/browser/branding/antumbra/firefox.ico differ
+index 0000000000000000000000000000000000000000..4ad22b0b4b36cc712ccb5da6d895e9278f1e26b3
+GIT binary patch
+literal 1418
+zcmZQzU}Rup5D;Jh(h>~e3=9luK&+qu;b#Hadx6-%0K%^Yveg+G7#tiR{0Tt*5+J{!
+z0mA16vQ3zPf<OQ=&lAXYWM*LK4DfU3<&xq83iEn;xC8-dpp6Uy93Zt5CT5rcDLGFU
+z$B>F!$v^fxHmV$9IC5tXlgpw&-o;XEQOuqk4F1yHsurAkZUR*@c)I$ztaD0e!eXof
+zP+9?O>>r7@i-8<NBx9F#Fm~*$WX))C)0NnoaHT1b8<nvn(jl0Ifv-B}%b~X-#z4*Z
+zYyt)eg8|s48wq(AfE*WyO>fUF<YiD0U^)1`rA6pP{6$57!4BccZ+@+;E(`f8SKP{i
+z3w)6m31v16oOgJu-vTcJmOB9D9l(~WazE<?a>AjOpFhaSpuod&@Q<qp=ga@8?OD?7
+z%)42A?iydbTK|@h7i284K!IK0E;G{|g@w-TyfZ<X@C17UP`Ux^9-o+RbAX&HQ1@Ki
+z2n-A!=7V22It6d+PjWsaw#?$?-iGz>ZgPd?C+oRF6H5&v1JDRynqXpZU|`??r5*(a
+z1{Sgffi3`n27PK7TE`r)fvt6~heqV*H!>ijaR&x44*;DH4vfnJ_J%+|2|xqmGAMEc
+zm=FH$PT>6Zf0OfhJ{<+-$!tu~-*Y-bfuX^n!oZ>c^feO$V*@Z86o3K3L1nH31Cs+o
+zA8pKrxf<k$2i!FDMgs#27}3%j91aW|2gIoz{0xi-^cgy?{$4smoQX@?jsXZ@2?+pz
+CZ{oNB
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/firefox64.ico b/browser/branding/antumbra/firefox64.ico
 new file mode 100644
-index 000000000000..513bbd2e296a
-Binary files /dev/null and b/browser/branding/antumbra/firefox64.ico differ
+index 0000000000000000000000000000000000000000..513bbd2e296a6ece0ffc980b9e2835e6762556a6
+GIT binary patch
+literal 1052
+zcmZQzU}RusaByG%(h>|47#JALfViOn!slgVU^oWkg8)e0lZk=hGEl5Dz|WnRONt99
+z%<Jjl5(K0jK$rt4&!EcvtP@Cud%8G=RNQ)d{vaoV0uRf<Kdv5}FaM{uXGya&?`HM6
+zYkcu){aZd>ph}{F0=vLnW~Ms|3!U3}XM%Kjy85}Sb4qB!;+_VebOYEuJ~7|s06ABn
+z?zy;;7w8`5gI_p01#j$6ay}%s%;M$VhV}1ma)sq5>$!rw00cFR3=Iqn0t^gHAg^(N
+z{I9^kz(Tel&`1zy(5IH6b<6=9*jo2`XheQ~BLgxTcVGZx4Cs7tU|bfkHw5}g02&yV
+zL6IZCeDHU70_V5?o1D+{=_oKyW@C!}p3@Nu3=Iwy1{MXNubCJa8-U@U01OZgDsvqe
+zm>d}TXk#|a)gV7S;HIHB8W>o>h?d^qaA4p#AWrSzXJ9;_&(Lx8_tF{SOkC1-3_t)&
+FNB|_|iNgQ@
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/locales/en-US/brand.ftl b/browser/branding/antumbra/locales/en-US/brand.ftl
 new file mode 100644
 index 000000000000..a64bd1bb5e99
@@ -836,27 +434,9 @@ index 000000000000..76210c1baf1e
 +brandShorterName=Antumbra
 +brandShortName=Antumbra
 +brandFullName=Antumbra Browser
-diff --git a/browser/branding/antumbra/locales/jar.mn b/browser/branding/antumbra/locales/jar.mn
-new file mode 100644
-index 000000000000..a28c3a6a98f1
---- /dev/null
-+++ b/browser/branding/antumbra/locales/jar.mn
-@@ -0,0 +1,12 @@
-+#filter substitution
-+# This Source Code Form is subject to the terms of the Mozilla Public
-+# License, v. 2.0. If a copy of the MPL was not distributed with this
-+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
-+
-+[localization] @AB_CD@.jar:
-+  branding                                          (en-US/**/*.ftl)
-+
-+@AB_CD@.jar:
-+% locale branding @AB_CD@ %locale/branding/
-+# Antumbra branding only exists in en-US
-+  locale/branding/brand.properties (en-US/brand.properties)
 diff --git a/browser/branding/antumbra/locales/moz.build b/browser/branding/antumbra/locales/moz.build
 new file mode 100644
-index 000000000000..527b359d11f2
+index 000000000000..e11d3263e3aa
 --- /dev/null
 +++ b/browser/branding/antumbra/locales/moz.build
 @@ -0,0 +1,5 @@
@@ -864,7 +444,7 @@ index 000000000000..527b359d11f2
 +# License, v. 2.0. If a copy of the MPL was not distributed with this
 +# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 +
-+JAR_MANIFESTS += ["jar.mn"]
++DIRS += ["en-US"]
 diff --git a/browser/branding/antumbra/moz.build b/browser/branding/antumbra/moz.build
 new file mode 100644
 index 000000000000..d7bba4be7a88
@@ -882,62 +462,45 @@ index 000000000000..d7bba4be7a88
 +
 +include("../branding-common.mozbuild")
 +FirefoxBranding()
-diff --git a/browser/branding/antumbra/msix/Assets/Document44x44.png b/browser/branding/antumbra/msix/Assets/Document44x44.png
-new file mode 100644
-index 000000000000..0d4e7915b8be
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/Document44x44.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/LargeTile.scale-200.png b/browser/branding/antumbra/msix/Assets/LargeTile.scale-200.png
-new file mode 100644
-index 000000000000..21290978923a
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/LargeTile.scale-200.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/MedTile.scale-200.png b/browser/branding/antumbra/msix/Assets/MedTile.scale-200.png
-new file mode 100644
-index 000000000000..979b9f0aeb65
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/MedTile.scale-200.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/SmallTile.scale-200.png b/browser/branding/antumbra/msix/Assets/SmallTile.scale-200.png
-new file mode 100644
-index 000000000000..ce01b51eedb0
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/SmallTile.scale-200.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/Square150x150Logo.scale-200.png b/browser/branding/antumbra/msix/Assets/Square150x150Logo.scale-200.png
-new file mode 100644
-index 000000000000..594ef2afa4a8
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/Square150x150Logo.scale-200.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/Square44x44Logo.altform-lightunplated_targetsize-256.png b/browser/branding/antumbra/msix/Assets/Square44x44Logo.altform-lightunplated_targetsize-256.png
-new file mode 100644
-index 000000000000..a5df4eb268b5
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/Square44x44Logo.altform-lightunplated_targetsize-256.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/Square44x44Logo.altform-unplated_targetsize-256.png b/browser/branding/antumbra/msix/Assets/Square44x44Logo.altform-unplated_targetsize-256.png
-new file mode 100644
-index 000000000000..a5df4eb268b5
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/Square44x44Logo.altform-unplated_targetsize-256.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/Square44x44Logo.scale-200.png b/browser/branding/antumbra/msix/Assets/Square44x44Logo.scale-200.png
-new file mode 100644
-index 000000000000..357d9ef3afe7
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/Square44x44Logo.scale-200.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/Square44x44Logo.targetsize-256.png b/browser/branding/antumbra/msix/Assets/Square44x44Logo.targetsize-256.png
-new file mode 100644
-index 000000000000..835a273dcb86
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/Square44x44Logo.targetsize-256.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/StoreLogo.scale-200.png b/browser/branding/antumbra/msix/Assets/StoreLogo.scale-200.png
-new file mode 100644
-index 000000000000..9a8d831e86df
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/StoreLogo.scale-200.png differ
-diff --git a/browser/branding/antumbra/msix/Assets/Wide310x150Logo.scale-200.png b/browser/branding/antumbra/msix/Assets/Wide310x150Logo.scale-200.png
-new file mode 100644
-index 000000000000..a6d1e6107664
-Binary files /dev/null and b/browser/branding/antumbra/msix/Assets/Wide310x150Logo.scale-200.png differ
 diff --git a/browser/branding/antumbra/newtab.ico b/browser/branding/antumbra/newtab.ico
 new file mode 100644
-index 000000000000..7e7fec791b92
-Binary files /dev/null and b/browser/branding/antumbra/newtab.ico differ
+index 0000000000000000000000000000000000000000..7e7fec791b92dc35d117c0c54129bd4821f35fb9
+GIT binary patch
+literal 231
+zcmZQzU}Ruo5D;Jh(h>~e3=9lvK&+qu;b#HawLsh%;OEZECB+3~@_Kr>1OaKF4h8`Z
+zCLlRsVul%zlJj(N45_%4{A0gkqskG6BX{;Nxhx9gT`a{G#q7z!;4j^+YQeeZCQv1V
+zr>mdKI;VstEXFDTr4_)&{*idQ7|1b1GIm)9W5>=)){GW6U5Tv;SDFI3Q5j1j9fDaH
+R_^NZh9C|Ba4Acy_2>{n5H`)LI
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/newwindow.ico b/browser/branding/antumbra/newwindow.ico
 new file mode 100644
-index 000000000000..7e7fec791b92
-Binary files /dev/null and b/browser/branding/antumbra/newwindow.ico differ
+index 0000000000000000000000000000000000000000..7e7fec791b92dc35d117c0c54129bd4821f35fb9
+GIT binary patch
+literal 231
+zcmZQzU}Ruo5D;Jh(h>~e3=9lvK&+qu;b#HawLsh%;OEZECB+3~@_Kr>1OaKF4h8`Z
+zCLlRsVul%zlJj(N45_%4{A0gkqskG6BX{;Nxhx9gT`a{G#q7z!;4j^+YQeeZCQv1V
+zr>mdKI;VstEXFDTr4_)&{*idQ7|1b1GIm)9W5>=)){GW6U5Tv;SDFI3Q5j1j9fDaH
+R_^NZh9C|Ba4Acy_2>{n5H`)LI
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/pbmode.ico b/browser/branding/antumbra/pbmode.ico
 new file mode 100644
-index 000000000000..7e7fec791b92
-Binary files /dev/null and b/browser/branding/antumbra/pbmode.ico differ
+index 0000000000000000000000000000000000000000..7e7fec791b92dc35d117c0c54129bd4821f35fb9
+GIT binary patch
+literal 231
+zcmZQzU}Ruo5D;Jh(h>~e3=9lvK&+qu;b#HawLsh%;OEZECB+3~@_Kr>1OaKF4h8`Z
+zCLlRsVul%zlJj(N45_%4{A0gkqskG6BX{;Nxhx9gT`a{G#q7z!;4j^+YQeeZCQv1V
+zr>mdKI;VstEXFDTr4_)&{*idQ7|1b1GIm)9W5>=)){GW6U5Tv;SDFI3Q5j1j9fDaH
+R_^NZh9C|Ba4Acy_2>{n5H`)LI
+
+literal 0
+HcmV?d00001
+
 diff --git a/browser/branding/antumbra/pref/firefox-branding.js b/browser/branding/antumbra/pref/firefox-branding.js
 new file mode 100644
 index 000000000000..532ea515a793
@@ -972,118 +535,3 @@ index 000000000000..23e3f5e95f31
 +    Square70x70Logo="VisualElements\PrivateBrowsing_70.png"
 +    ForegroundText="light"/>
 +</Application>
-diff --git a/browser/branding/antumbra/stubinstaller/bgstub.jpg b/browser/branding/antumbra/stubinstaller/bgstub.jpg
-new file mode 100644
-index 000000000000..cd8da261d182
-Binary files /dev/null and b/browser/branding/antumbra/stubinstaller/bgstub.jpg differ
-diff --git a/browser/branding/antumbra/stubinstaller/installing_page.css b/browser/branding/antumbra/stubinstaller/installing_page.css
-new file mode 100644
-index 000000000000..0e6bcc68f23f
---- /dev/null
-+++ b/browser/branding/antumbra/stubinstaller/installing_page.css
-@@ -0,0 +1,52 @@
-+/* This Source Code Form is subject to the terms of the Mozilla Public
-+ * License, v. 2.0. If a copy of the MPL was not distributed with this
-+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-+
-+body {
-+  color: white;
-+}
-+
-+#label,
-+#progress_background,
-+#blurb {
-+  text-align: center;
-+  margin: 20px 30px;
-+}
-+
-+#label {
-+  font-size: 40px;
-+  margin-top: 100px;
-+  margin-bottom: 20px;
-+}
-+
-+#progress_background {
-+  margin: 0 auto;
-+  width: 60%;
-+  height: 24px;
-+  background-color: #f5cbf6;
-+  border-radius: 8px;
-+  padding: 3px;
-+}
-+
-+body.high-contrast #progress_background {
-+  outline: solid;
-+}
-+
-+#progress_bar {
-+  margin: 0;
-+  width: 0%;
-+  height: 100%;
-+  background-color: #7543e3;
-+  border-radius: 6px;
-+}
-+
-+/* In high contrast mode, fill the entire progress bar with its border. */
-+body.high-contrast #progress_bar {
-+  /* This border should be the height of progress_background. */
-+  border-top: 24px solid;
-+  box-sizing: border-box;
-+}
-+
-+#blurb {
-+  font-size: 20px;
-+}
-diff --git a/browser/branding/antumbra/stubinstaller/profile_cleanup_page.css b/browser/branding/antumbra/stubinstaller/profile_cleanup_page.css
-new file mode 100644
-index 000000000000..07f8e31d09d2
---- /dev/null
-+++ b/browser/branding/antumbra/stubinstaller/profile_cleanup_page.css
-@@ -0,0 +1,35 @@
-+/* This Source Code Form is subject to the terms of the Mozilla Public
-+ * License, v. 2.0. If a copy of the MPL was not distributed with this
-+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-+
-+body {
-+  color: white;
-+}
-+
-+#header,
-+#refreshCheckboxContainer,
-+#refreshButtonContainer {
-+  text-align: center;
-+  margin-left: 40px;
-+  margin-right: 40px;
-+  margin-bottom: 30px;
-+}
-+
-+#header {
-+  font-size: 35px;
-+  font-weight: normal;
-+  margin-top: 45px;
-+}
-+
-+#refreshCheckbox {
-+  vertical-align: middle;
-+}
-+
-+#checkboxLabel {
-+  font-size: 13px;
-+}
-+
-+#refreshButton {
-+  padding: 8px 40px;
-+  font-size: 15px;
-+}
-diff --git a/browser/branding/antumbra/wizHeader.bmp b/browser/branding/antumbra/wizHeader.bmp
-new file mode 100644
-index 000000000000..89eaf901254c
-Binary files /dev/null and b/browser/branding/antumbra/wizHeader.bmp differ
-diff --git a/browser/branding/antumbra/wizHeaderRTL.bmp b/browser/branding/antumbra/wizHeaderRTL.bmp
-new file mode 100644
-index 000000000000..451d87c70ef0
-Binary files /dev/null and b/browser/branding/antumbra/wizHeaderRTL.bmp differ
-diff --git a/browser/branding/antumbra/wizWatermark.bmp b/browser/branding/antumbra/wizWatermark.bmp
-new file mode 100644
-index 000000000000..f9d6a870e952
-Binary files /dev/null and b/browser/branding/antumbra/wizWatermark.bmp differ

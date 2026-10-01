@@ -110,7 +110,10 @@ jobs:
           for dir in third_party/extensions/*/; do
             [[ -d "$dir" ]] || continue
             name="$(basename "${dir}")"
-            if ! grep -qi "${name}" THIRD-PARTY.md; then
+            # Allow hyphens in dir name to match either hyphen or space in the doc
+            # (e.g. "ublock-origin" matches "uBlock Origin").
+            pattern="$(echo "${name}" | sed 's/-/[-[:space:]]/g')"
+            if ! grep -qiE "${pattern}" THIRD-PARTY.md; then
               echo "MISSING THIRD-PARTY.md row for: ${name}"
               MISSING=1
             fi

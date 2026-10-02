@@ -66,16 +66,19 @@ jobs:
 
       - name: Fetch upstream files needed for patch check
         run: |
-          # Only browser/moz.build is modified by an existing-file patch.
-          # All other Milestone 1 patches create new files, which need no
-          # existing content to pass git apply --check.
+          # browser/moz.build and browser/components/moz.build are the only
+          # existing files modified by the patch series. All other patches
+          # create new files, which need no existing content for git apply --check.
           # Fetching one file avoids a full Firefox clone (20+ GB, D7).
           # Using the GitHub gecko-dev mirror (same commit SHA as local tree).
           TAG="FIREFOX_153_3_0esr_RELEASE"
           BASE="https://raw.githubusercontent.com/mozilla-firefox/firefox/${TAG}"
           mkdir -p upstream-firefox/browser
+          mkdir -p upstream-firefox/browser/components
           curl -sSf "${BASE}/browser/moz.build" \
             -o upstream-firefox/browser/moz.build
+          curl -sSf "${BASE}/browser/components/moz.build" \
+            -o upstream-firefox/browser/components/moz.build
           cd upstream-firefox
           git init -q
           git config user.email "ci@antumbra"

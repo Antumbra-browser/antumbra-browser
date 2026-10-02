@@ -31,7 +31,7 @@ jobs:
           # Using the GitHub gecko-dev mirror guarantees content matches the local
           # tree (same commit SHA); HG raw-file can serve different encodings.
           TAG="FIREFOX_153_3_0esr_RELEASE"
-          BASE="https://raw.githubusercontent.com/mozilla/gecko-dev/${TAG}"
+          BASE="https://raw.githubusercontent.com/mozilla-firefox/firefox/${TAG}"
           mkdir -p upstream-prefs/browser/app/profile
           mkdir -p upstream-prefs/modules/libpref/init
           mkdir -p upstream-prefs/browser/extensions/newtab/lib
@@ -72,7 +72,7 @@ jobs:
           # Fetching one file avoids a full Firefox clone (20+ GB, D7).
           # Using the GitHub gecko-dev mirror (same commit SHA as local tree).
           TAG="FIREFOX_153_3_0esr_RELEASE"
-          BASE="https://raw.githubusercontent.com/mozilla/gecko-dev/${TAG}"
+          BASE="https://raw.githubusercontent.com/mozilla-firefox/firefox/${TAG}"
           mkdir -p upstream-firefox/browser
           curl -sSf "${BASE}/browser/moz.build" \
             -o upstream-firefox/browser/moz.build

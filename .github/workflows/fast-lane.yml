@@ -28,10 +28,14 @@ jobs:
         run: |
           # Download only the pref files needed for the audit.
           # Full Firefox checkout is not required and exceeds CI disk limits (D7).
+          # Using the GitHub gecko-dev mirror guarantees content matches the local
+          # tree (same commit SHA); HG raw-file can serve different encodings.
           TAG="FIREFOX_153_3_0esr_RELEASE"
-          BASE="https://hg.mozilla.org/releases/mozilla-esr153/raw-file/${TAG}"
+          BASE="https://raw.githubusercontent.com/mozilla/gecko-dev/${TAG}"
           mkdir -p upstream-prefs/browser/app/profile
           mkdir -p upstream-prefs/modules/libpref/init
+          mkdir -p upstream-prefs/browser/extensions/newtab/lib
+          mkdir -p upstream-prefs/toolkit/components/telemetry/app
           curl -sSf "${BASE}/browser/app/profile/firefox.js" \
             -o upstream-prefs/browser/app/profile/firefox.js
           curl -sSf "${BASE}/modules/libpref/init/all.js" \
@@ -40,6 +44,13 @@ jobs:
             -o upstream-prefs/modules/libpref/init/StaticPrefList.yaml
           curl -sSf "${BASE}/browser/app/profile/channel-prefs.js" \
             -o upstream-prefs/browser/app/profile/channel-prefs.js || true
+          # Component files: newtab activity-stream prefs, telemetry, contentblocking
+          curl -sSf "${BASE}/browser/extensions/newtab/lib/AboutPreferences.sys.mjs" \
+            -o upstream-prefs/browser/extensions/newtab/lib/AboutPreferences.sys.mjs || true
+          curl -sSf "${BASE}/toolkit/components/telemetry/app/TelemetryControllerBase.sys.mjs" \
+            -o upstream-prefs/toolkit/components/telemetry/app/TelemetryControllerBase.sys.mjs || true
+          curl -sSf "${BASE}/modules/libpref/Preferences.cpp" \
+            -o upstream-prefs/modules/libpref/Preferences.cpp || true
 
       - name: Run pref audit
         run: |
@@ -59,8 +70,9 @@ jobs:
           # All other Milestone 1 patches create new files, which need no
           # existing content to pass git apply --check.
           # Fetching one file avoids a full Firefox clone (20+ GB, D7).
+          # Using the GitHub gecko-dev mirror (same commit SHA as local tree).
           TAG="FIREFOX_153_3_0esr_RELEASE"
-          BASE="https://hg.mozilla.org/releases/mozilla-esr153/raw-file/${TAG}"
+          BASE="https://raw.githubusercontent.com/mozilla/gecko-dev/${TAG}"
           mkdir -p upstream-firefox/browser
           curl -sSf "${BASE}/browser/moz.build" \
             -o upstream-firefox/browser/moz.build
@@ -180,6 +192,7 @@ jobs:
           done < <(find . -name "*.md" \
             -not -path "./third_party/*" \
             -not -path "./.git/*" \
+            -not -path "./.planning/*" \
             -print0)
           if [[ $FAILED -ne 0 ]]; then
             echo "Docs check FAILED: em dashes found. Use hyphens or rephrase."

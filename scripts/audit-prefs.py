@@ -30,11 +30,19 @@ from pathlib import Path
 ALLOWLISTED_PREFIXES = ["antumbra."]
 
 # Upstream pref files to search, relative to the Firefox source root.
+# The first four are the main static pref files. The remaining three cover
+# prefs that are defined in component files outside the main pref infrastructure.
 UPSTREAM_PREF_FILES = [
     "browser/app/profile/firefox.js",
     "modules/libpref/init/all.js",
     "modules/libpref/init/StaticPrefList.yaml",
     "browser/app/profile/channel-prefs.js",
+    # newtab activity-stream prefs (feeds.topsites, showSponsored, etc.)
+    "browser/extensions/newtab/lib/AboutPreferences.sys.mjs",
+    # toolkit.telemetry.enabled (registered dynamically, not in static pref files)
+    "toolkit/components/telemetry/app/TelemetryControllerBase.sys.mjs",
+    # browser.contentblocking.category (registered in C++ via PREF_LIST_ENTRY)
+    "modules/libpref/Preferences.cpp",
 ]
 
 
@@ -50,9 +58,15 @@ def is_allowlisted(pref_name: str) -> bool:
 
 
 def search_pref_in_files(pref_name: str, search_paths: list[Path]) -> bool:
-    """Return True if pref_name appears as a quoted string in any of the paths."""
+    """Return True if pref_name appears in any of the paths.
+
+    Matches two formats:
+    - Quoted string in .js/.mjs/.cpp: pref("name", ...) or const P = "name"
+    - YAML name field in StaticPrefList.yaml: '- name: pref.name'
+    """
     escaped = re.escape(pref_name)
-    pattern = re.compile(r'["\']' + escaped + r'["\']')
+    quoted_pattern = re.compile(r'["\']' + escaped + r'["\']')
+    yaml_name_pattern = re.compile(r'name:\s+' + escaped + r'\s*$', re.MULTILINE)
     for path in search_paths:
         if not path.exists():
             continue
@@ -60,7 +74,9 @@ def search_pref_in_files(pref_name: str, search_paths: list[Path]) -> bool:
             text = path.read_text(encoding="utf-8", errors="ignore")
         except OSError:
             continue
-        if pattern.search(text):
+        if quoted_pattern.search(text):
+            return True
+        if path.suffix == '.yaml' and yaml_name_pattern.search(text):
             return True
     return False
 

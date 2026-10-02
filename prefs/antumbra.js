@@ -34,7 +34,6 @@ pref("toolkit.telemetry.unified", false);
 pref("toolkit.telemetry.server", "");
 pref("datareporting.healthreport.uploadEnabled", false);
 pref("datareporting.policy.dataSubmissionEnabled", false);
-pref("browser.ping-centre.telemetry", false);
 
 /* --- Normandy / studies / experiments (D5) --- */
 pref("app.normandy.enabled", false);
@@ -60,9 +59,6 @@ pref("browser.newtabpage.activity-stream.feeds.topsites", false);
 pref("browser.newtabpage.activity-stream.showSponsored", false);
 pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
-
-/* --- Pocket off --- */
-pref("extensions.pocket.enabled", false);
 
 /* --- Content recommendations (discovery stream) off --- */
 pref("browser.newtabpage.activity-stream.discoverystream.enabled", false);

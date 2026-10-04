@@ -89,6 +89,77 @@ jobs:
       - name: Check patches apply cleanly (dry run -- no changes made)
         run: bash scripts/apply-patches.sh --check --firefox-src upstream-firefox
 
+  patch-source-sync-check:
+    name: Patch and source copy sync check
+    runs-on: ubuntu-latest
+    # Catches the "fixed in the tree but never regenerated into the patch"
+    # failure mode (DECISIONS.md D16). We apply the patch series to a stub
+    # Firefox dir and compare the result for owned paths against the
+    # branding/ source copies committed in this repo. If a developer edits
+    # a file during a local build without regenerating the owning patch, the
+    # source copy and the patch output diverge and this job fails.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply patches to a stub tree and compare to source copies
+        run: |
+          set -euo pipefail
+          TAG="FIREFOX_153_3_0esr_RELEASE"
+          BASE="https://raw.githubusercontent.com/mozilla-firefox/firefox/${TAG}"
+          STUB="$(mktemp -d)"
+          mkdir -p "${STUB}/browser" "${STUB}/browser/components"
+          curl -sSf "${BASE}/browser/moz.build" \
+            -o "${STUB}/browser/moz.build"
+          curl -sSf "${BASE}/browser/components/moz.build" \
+            -o "${STUB}/browser/components/moz.build"
+          cd "${STUB}"
+          git init -q
+          git config user.email "ci@antumbra"
+          git config user.name "CI"
+          git add .
+          git commit -q -m "stub"
+          cd - >/dev/null
+          for p in $(find patches -name "*.patch" | sort); do
+            git -C "${STUB}" apply --3way "$(pwd)/${p}"
+          done
+
+          # Compare: for every path in branding/antumbra/, the file produced
+          # by the patch series must match the committed source copy.
+          FAIL=0
+          while IFS= read -r -d '' src; do
+            rel="${src#branding/antumbra/}"
+            # Patches land content at browser/branding/antumbra/<rel>.
+            exp="${STUB}/browser/branding/antumbra/${rel}"
+            if [[ ! -e "${exp}" ]]; then
+              echo "DRIFT: ${src} has no counterpart produced by the patch series"
+              FAIL=1
+            elif ! diff -q "${src}" "${exp}" >/dev/null 2>&1; then
+              echo "DRIFT: ${src} differs from what the patch series produces"
+              diff -u "${src}" "${exp}" | head -40 | sed 's/^/  /'
+              FAIL=1
+            fi
+          done < <(find branding/antumbra -type f -print0)
+
+          # Reverse direction: anything the patch produces under branding/antumbra
+          # must have a committed source copy.
+          while IFS= read -r -d '' exp; do
+            rel="${exp#${STUB}/browser/branding/antumbra/}"
+            src="branding/antumbra/${rel}"
+            if [[ ! -e "${src}" ]]; then
+              echo "DRIFT: ${src} missing (patches produce it, source copy is absent)"
+              FAIL=1
+            fi
+          done < <(find "${STUB}/browser/branding/antumbra" -type f -print0)
+
+          if [[ "${FAIL}" -ne 0 ]]; then
+            echo
+            echo "FAIL: branding/ source copies drifted from the patch series."
+            echo "A fix was likely applied in the local Firefox tree without"
+            echo "regenerating the owning patch (DECISIONS.md D16)."
+            exit 1
+          fi
+          echo "PASS: branding/ source copies match the patch series."
+
   license-check:
     name: License check
     runs-on: ubuntu-latest

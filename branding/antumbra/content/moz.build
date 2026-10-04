@@ -5,11 +5,11 @@
 JAR_MANIFESTS += ["jar.mn"]
 
 FINAL_TARGET_FILES.browser.chrome.branding += [
-    "about-logo.png",
-    "about-logo@2x.png",
-    "about-logo.svg",
     "about-logo-private.png",
     "about-logo-private@2x.png",
+    "about-logo.png",
+    "about-logo.svg",
+    "about-logo@2x.png",
     "about-wordmark.svg",
     "firefox-wordmark.svg",
 ]

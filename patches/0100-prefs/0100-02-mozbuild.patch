@@ -1,8 +1,20 @@
+diff --git a/browser/components/moz.build b/browser/components/moz.build
+index d1d769ab0911..d9f1ad110836 100644
+--- a/browser/components/moz.build
++++ b/browser/components/moz.build
+@@ -29,6 +29,7 @@ DIRS += [
+     "aboutlogins",
+     "aboutwelcome",
+     "aiwindow",
++    "antumbra",
+     "asrouter",
+     "attribution",
+     "backup",
 diff --git a/browser/moz.build b/browser/moz.build
-index 5a03cfc6d3f8..8329cd1e5af1 100644
+index 5a03cfc6d3f8..1dd241694cf1 100644
 --- a/browser/moz.build
 +++ b/browser/moz.build
-@@ -1,109 +1,114 @@
+@@ -1,109 +1,115 @@
 -# This Source Code Form is subject to the terms of the Mozilla Public
 -# License, v. 2.0. If a copy of the MPL was not distributed with this
 -# file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -139,6 +151,7 @@ index 5a03cfc6d3f8..8329cd1e5af1 100644
 +
 +DIRS += [
 +    "app",
++    "distribution",
 +]
 +
 +if CONFIG["MAKENSISU"]:

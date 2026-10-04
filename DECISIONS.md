@@ -533,6 +533,69 @@ Until that is done, the branding source files in `antumbra-browser/branding/antu
 
 ---
 
+## 2026-10-03
+
+---
+
+### D16. RECURRING FAILURE PATTERN: fixes applied in the Firefox tree without regenerating the owning patch
+
+**Status.** Structural guard added as a Milestone 1 blocker fix.
+
+**Problem.**
+
+Across Milestone 0 and Milestone 1 the same failure mode has blocked cold builds several times:
+
+1. A developer applies the patch series to the Firefox source tree.
+2. During a build session the developer discovers a problem (unsorted `FINAL_TARGET_FILES`, `DIRS` referencing a non-existent `moz.build`, a missing jar.mn, a chrome asset not registered in jar.mn).
+3. The developer edits the file in place in the Firefox tree, the next build succeeds.
+4. The regenerated patch is never written back to `patches/`, and the `branding/antumbra/` source copies are never updated.
+5. The commit lands with a patch series that is incomplete relative to what actually produced the working binary.
+6. The next cold build on any machine fails with an error that no longer appears anywhere in the committed artifacts.
+
+Known evidence:
+
+- `aboutDialog.css` was present in the Firefox tree and the shipped build for multiple sessions before it was discovered that no patch and no `branding/antumbra/` source copy produced it. The file existed only because an earlier session had copied it in manually.
+- `browser/branding/antumbra/content/moz.build` had `FINAL_TARGET_FILES.browser.chrome.branding` in unsorted order in the committed `0000-01-branding-dir.patch` long after a session had locally sorted it to pass configure (`UnsortedError`). Rediscovered in 2026-10-03.
+- `browser/branding/antumbra/locales/moz.build` shipped as `DIRS += ["en-US"]` in the committed patch despite the fix being documented in project memory. Rediscovered in 2026-10-03.
+- `browser/branding/antumbra/locales/jar.mn` was created in the Firefox tree during a Milestone 0 session but never added to any patch. Rediscovered in 2026-10-03.
+
+The common cause is that `git apply` to the Firefox tree does not stage the result in the antumbra-browser repo. The two trees are siblings, not linked, and a tree-side edit is invisible to anything that only inspects `antumbra-browser/`.
+
+**Decision.**
+
+Two structural guards, both automatic.
+
+1. **`scripts/check-tree-sync.sh`** on the maintainer's machine. Creates a scratch worktree at the pinned ESR tag, applies the full patch series to it, and compares every owned path and every shared file against the current Firefox tree. Any difference is drift and exits non-zero. Intended to be run before every commit that touches `patches/` and before every `/gsd-ship` or push to main.
+
+2. **`patch-source-sync-check` CI job** in `.github/workflows/fast-lane.yml`. Applies the patch series to a stub Firefox tree in CI and compares the result for `browser/branding/antumbra/` against the committed `branding/antumbra/` source copies. Fails on any mismatch in either direction (patch produces a file the source copy doesn't have; source copy exists for a file no patch produces; content differs). This runs on every push and PR and does not depend on a Firefox checkout.
+
+**What the guard catches:**
+
+- Patch output and `branding/antumbra/` source copy diverge in content.
+- Patch creates a file not represented in `branding/antumbra/` (orphan patch output).
+- `branding/antumbra/` has a file not produced by any patch (orphan source copy).
+- Local-only drift on the maintainer's Firefox tree (local script only).
+
+**What the guard does not catch:**
+
+- Edits to upstream files that no patch currently touches and that live outside the owned prefix list in `check-tree-sync.sh`. If a developer modifies a file that no patch references and does not create a patch, neither guard flags it. Broaden the owned prefix list as new patch areas are added.
+- Patches whose content is syntactically valid but semantically wrong (a pref typo that lands in `antumbra.js` and passes audit, for example). Caught by the pref audit CI job and by on-screen verification, not by this guard.
+- Changes applied via symlinks, hard links, or anything outside git's view.
+
+**Reasoning.**
+
+The symptom in every past incident is "cold build fails on something that was fixed weeks ago". The root cause is that the Firefox tree is not a committed artifact and the patch series is, and a human step bridges the two. Any human step that is both (a) required for correctness and (b) easy to skip will be skipped. The response is to make the bridge detectable rather than require perfect discipline.
+
+The two-guard shape is deliberate: the CI job catches patch/source-copy drift on every push, which stops bad commits from reaching main; the local script catches tree/patch drift before commit, which stops bad commits from being authored. Either alone leaves a hole.
+
+**Consequence.**
+
+Milestone 1 ships only after both guards are green and the drift-detector run on the maintainer's Firefox tree is clean.
+
+**Affects:** `scripts/check-tree-sync.sh` (new), `.github/workflows/fast-lane.yml` (new `patch-source-sync-check` job), `branding/antumbra/` (now authoritative source copies, synced on every patch regeneration).
+
+---
+
 ## Still open
 
 Carried forward from ARCHITECTURE.md section 13. Not yet decided.

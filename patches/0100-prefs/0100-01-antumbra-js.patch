@@ -1,9 +1,9 @@
 diff --git a/browser/app/profile/antumbra.js b/browser/app/profile/antumbra.js
 new file mode 100644
-index 000000000000..85cfee47ec4d
+index 000000000000..31336d95ce15
 --- /dev/null
 +++ b/browser/app/profile/antumbra.js
-@@ -0,0 +1,94 @@
+@@ -0,0 +1,126 @@
 +/* This Source Code Form is subject to the terms of the Mozilla Public
 + * License, v. 2.0. If a copy of the MPL was not distributed with this
 + * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -95,6 +95,38 @@ index 000000000000..85cfee47ec4d
 + */
 +pref("extensions.getAddons.showPane", false);
 +pref("extensions.htmlaboutaddons.recommendations.enabled", false);
++
++/* --- Firefox Accounts / Sync disabled entirely for Milestone 1 (D18 Q5a).
++ * Returns when Antumbra Sync ships per MONETIZATION.md. The toolbar button
++ * is additionally removed via patch 0400-fxa-ui-removal to prevent a
++ * visible-but-dead affordance.
++ */
++pref("identity.fxaccounts.enabled", false);
++pref("services.sync.enabled", false);
++
++/* --- Pocket: integration disabled (D18 Q5a). Note: policies.json
++ * DisablePocket is not implemented in ESR 153 (schema-only), so the pref
++ * is the control that works.
++ */
++pref("extensions.pocket.enabled", false);
++
++/* --- Mozilla Monitor card in Protections dashboard off (D18 Q5a). */
++pref("browser.contentblocking.report.monitor.enabled", false);
++
++/* --- Firefox Relay autofill suggestions off (D18 Q5a). */
++pref("signon.firefoxRelay.feature", "disabled");
++
++/* --- SUMO and in-content support links rewritten to antumbrabrowser.org
++ * so they do not reach mozilla.com (D18 Q5a). The receiving pages do not
++ * exist yet; this is a before-launch content item in ROADMAP.md.
++ */
++pref("app.support.baseURL", "https://antumbrabrowser.org/help/");
++pref("browser.contentblocking.report.lockwise.how_it_works.url", "https://antumbrabrowser.org/help/passwords");
++pref("browser.contentblocking.report.social.url", "https://antumbrabrowser.org/help/trackers/social");
++pref("browser.contentblocking.report.cookie.url", "https://antumbrabrowser.org/help/trackers/cookies");
++pref("browser.contentblocking.report.tracker.url", "https://antumbrabrowser.org/help/trackers/content");
++pref("browser.contentblocking.report.fingerprinter.url", "https://antumbrabrowser.org/help/trackers/fingerprint");
++pref("browser.contentblocking.report.cryptominer.url", "https://antumbrabrowser.org/help/trackers/cryptomining");
 +
 +/* --- Antumbra protection mode (new pref; antumbra.* allowlisted in audit-prefs.py) --- */
 +pref("antumbra.protection.mode", "standard");

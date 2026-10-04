@@ -79,6 +79,7 @@ OWNED_PREFIXES=(
 SHARED_FILES=(
     "browser/moz.build"
     "browser/components/moz.build"
+    "browser/themes/shared/customizableui/panelUI-shared.css"
 )
 
 echo "Pinned tag: ${PINNED_TAG}"

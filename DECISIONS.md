@@ -700,15 +700,106 @@ ARCHITECTURE.md 6.8.
 
 ---
 
+### D18. Milestone 1 Mozilla-independence decisions: Q3, Q5, Q6, Q7 closed
+
+**Status.** Four open questions from D17 and the original ARCHITECTURE.md
+list are closed with the following decisions. Q4 (funding) remains open
+but is owned by the maintainer directly, not by code; it stays in the
+before-launch table.
+
+**Q5. Firefox Accounts, Sync, and other Mozilla-service entry points: Option A, disable entirely.**
+
+- `identity.fxaccounts.enabled = false` in `prefs/antumbra.js`.
+- `services.sync.enabled = false` in `prefs/antumbra.js`.
+- `DisableFirefoxAccounts: true` added to `prefs/policies.json`
+  as belt-and-braces.
+- The pref alone does not hide the toolbar button on ESR 153. The
+  CSS at `browser/themes/shared/customizableui/panelUI-shared.css:732-734`
+  only hides `#appMenu-fxa-status2` and `#appMenu-fxa-separator` when
+  `:root[fxadisabled="true"]`. The `fxa-toolbar-menu-button` element has
+  no `.sync-ui-item` class and is not covered by `onFxaDisabled()` in
+  `browser/base/content/browser-sync.js:2903-2910`. Therefore a chrome
+  patch is required to hide it: `patches/0400-fxa-ui-removal/0400-01-hide-toolbar-button.patch`
+  extends the existing selector to include `#fxa-toolbar-menu-button`.
+  Minimal patch; follows upstream's own disable mechanism; does not
+  introduce a new attribute or require JS changes.
+- Pref one-liners also set in `prefs/antumbra.js`:
+  - `extensions.pocket.enabled = false` (DisablePocket policy
+    is schema-only on ESR 153 and does not take effect).
+  - `browser.contentblocking.report.monitor.enabled = false`.
+  - `signon.firefoxRelay.feature = "disabled"`.
+- SUMO and support URLs rewritten to `https://antumbrabrowser.org/help/*`.
+  Receiving pages do not exist yet; recorded as a before-launch content
+  item in ROADMAP.md. Rewrites avoid dead links; a `about:blank` target
+  would be worse user experience than a 404 on the eventual help site.
+
+Reasoning. Shipping Milestone 1 with live mozilla.com account entry
+points would make MONETIZATION.md's Antumbra Sync plan read as
+aspirational while the browser's first click leads the user to a
+Mozilla account. Option A is cheap and reversible once Antumbra Sync
+exists. The toolbar-button chrome patch is small, isolated to a
+single CSS file, and uses an attribute upstream already defines; its
+rebase cost is near zero.
+
+Consequence. No cross-device bookmark/password/history sync in
+Milestone 1. No "send tab to device" context menu entries. The
+feature returns when Antumbra Sync ships, per MONETIZATION.md.
+
+**Q6. Add-on source: keep AMO.**
+
+Running a self-hosted mirror or allowlist is real infrastructure work
+and buys no privacy improvement for user-initiated installs. The
+Recommended cards and the Discovery pane in about:addons are the real
+problem, and D17 already hid those via
+`extensions.getAddons.showPane = false` and
+`extensions.htmlaboutaddons.recommendations.enabled = false`. Keeping
+AMO is consistent with D3 (signing enforcement stays on).
+
+Consequence. Antumbra uses AMO for extension discovery and signed
+distribution. Does not revisit until there is a specific reason.
+
+**Q7. Multi-Account Containers: confirm Milestone 4 as planned.**
+
+Ship MAC unmodified for Milestone 1, with the release-notes line
+noting the "Firefox Multi-Account Containers" branding. Milestone 4
+replaces MAC with the native minimum-viable container UI described
+in D17 (toolbar button + picker panel + context menu + tab coloring,
+roughly 2 to 3 weeks of chrome-patch work).
+
+**Q3. Default DNS resolver: Quad9 pre-selected.**
+
+`branding/antumbra/content/antumbra-content/dns-resolvers.json`
+already has Quad9 marked `"default": true`. Reasoning published here:
+
+- Swiss non-profit.
+- Documented no-log policy for source IPs.
+- Blocks known malware domains at the resolver level, which aligns
+  with D5 (keep local Safe Browsing lists on for the audience most
+  likely to get phished).
+- No commercial advertising or data-brokerage relationships.
+
+The first-run picker still shows Mullvad, AdGuard, Cloudflare, the
+system resolver, and a custom URL field. Quad9 is a default, not a
+lock. The reasoning is recorded here so changing the pre-selected
+default requires a new DECISIONS.md entry.
+
+**Q4. Funding items: user-owned, remain in before-launch table.**
+
+Maintainer handles the `antumbrabrowser.org` domain purchase and
+starts the SignPath application directly. These stay on the
+Milestone 1 before-launch blocker list in ROADMAP.md.
+
+**Affects:** `prefs/antumbra.js`, `prefs/policies.json`,
+`patches/0400-fxa-ui-removal/0400-01-hide-toolbar-button.patch` (new),
+`ROADMAP.md` Milestone 1 before-launch and still-open list.
+
+---
+
 ## Still open
 
-Carried forward from ARCHITECTURE.md section 13. Not yet decided.
+Carried forward from ARCHITECTURE.md section 13 and D17.
 
 | # | Question | Needed by |
 |---|---|---|
 | 1 | **Split view.** Highest permanent maintenance cost in the spec. Confirm it is worth an annual re-patch against actively refactored front end code. | Milestone 4 |
-| 3 | **Default DNS resolver.** An editorial choice with real privacy consequences. The reasoning must be published, not made quietly. | Milestone 1 |
-| 5 | **Mozilla-service entry points in the UI (D17).** The account icon, about:addons AMO pane, Monitor, Relay, and in-content SUMO links still reach mozilla.com. Options: (a) disable Firefox Accounts/Sync entirely for Milestone 1, (b) keep Sync against a self-hosted sync server, (c) ship as-is and accept the reviewer narrative. See D17 for each service's control surface. | Milestone 1 |
-| 6 | **Add-on source: AMO vs self-hosted mirror or allowlist.** Antumbra currently uses AMO for discovery and updates. Keeping it is cheap and consistent with D3 signing. Replacing it is real infrastructure work. See D17. | Milestone 4 or later |
-| 7 | **Multi-Account Containers path.** Milestone 1 ships MAC unmodified (branding inconsistency documented in release notes). Milestone 4 replaces with native minimum-viable container UI per D17. Confirm this ordering. | Milestone 4 |
-| 4 | **Funding.** Signing, a domain, and a trademark clearance opinion are real year-one costs before anyone is paid for their time. | Milestone 0 |
+| 4 | **Funding.** Maintainer handles domain purchase and SignPath application directly. Remains an item in the Milestone 1 before-launch table but is not a code decision. | Milestone 0 (in flight with maintainer) |

@@ -594,15 +594,25 @@ because onboarding is the differentiator.
   complete; those files still contain nightly dimensions and colors. The CSS
   files reference nightly image paths. Replace before any installer goes to
   users.
-- [ ] **Decide on Mozilla-service UI entry points (D17).** The account icon,
-  about:addons recommendations pane, and in-content SUMO links still reach
-  mozilla.com services. See D17 options a/b/c; this is the "most non-cosmetic"
-  item blocking the Milestone 1 claim of independence.
-- [ ] **Decide on Multi-Account Containers path (D17).** Previous plan was
-  Option C (ship unmodified for Milestone 1, replace with native UI in
-  Milestone 4). D17 revisits this with revised cost estimates for a native
-  minimum-viable container UI versus a fork, because the fork path collides
-  with D3's extension-signing stance.
+- [x] **Mozilla-service UI entry points (D17/D18).** Decided Option A: Firefox
+  Accounts and Sync disabled entirely for Milestone 1. Pocket, Monitor,
+  Relay disabled via pref. SUMO and support URLs rewritten to
+  `antumbrabrowser.org/help/*`. Chrome patch `0400-fxa-ui-removal` hides
+  the toolbar account button. Sync returns when Antumbra Sync ships
+  (MONETIZATION.md).
+- [x] **Multi-Account Containers path (D17/D18).** Confirmed Milestone 1
+  ships MAC unmodified with the release-notes line; Milestone 4 replaces
+  with native minimum-viable container UI.
+- [ ] **Content for `antumbrabrowser.org/help/*` pages.** The in-content
+  support links were rewritten away from support.mozilla.org to
+  `antumbrabrowser.org/help/{passwords,trackers/*}` and friends in D18.
+  The receiving pages do not exist yet. They need to exist before the
+  release goes to users; otherwise shields and preferences surfaces will
+  link to 404s.
+- [ ] **Per-site step-down UI in the shield panel.** Required for
+  Milestone 1 per ARCHITECTURE.md 5.3 and the roadmap text above. Without
+  it, the first broken site makes a user turn protection off globally.
+  Not yet started.
 
 ### Explicitly out of scope for milestone 1
 

@@ -15,10 +15,10 @@ index 000000000000..4c2501fb22b3
 +]
 diff --git a/browser/distribution/policies.json b/browser/distribution/policies.json
 new file mode 100644
-index 000000000000..847015d60327
+index 000000000000..9d56c2720e1d
 --- /dev/null
 +++ b/browser/distribution/policies.json
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,27 @@
 +{
 +  "policies": {
 +    "ExtensionSettings": {
@@ -35,6 +35,7 @@ index 000000000000..847015d60327
 +    "DisableSystemAddonUpdate": true,
 +    "DisableTelemetry": true,
 +    "DisableFirefoxStudies": true,
++    "DisableFirefoxAccounts": true,
 +    "OverrideFirstRunPage": "",
 +    "DisableFeedbackCommands": true,
 +    "DisableSetDesktopBackground": false,

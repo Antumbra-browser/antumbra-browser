@@ -1,0 +1,14 @@
+diff --git a/browser/themes/shared/customizableui/panelUI-shared.css b/browser/themes/shared/customizableui/panelUI-shared.css
+index 2c3d192d8842..3b8035ef65fa 100644
+--- a/browser/themes/shared/customizableui/panelUI-shared.css
++++ b/browser/themes/shared/customizableui/panelUI-shared.css
+@@ -730,7 +730,8 @@ toolbarbutton[constrain-size="true"][cui-areatype="panel"] > .toolbarbutton-badg
+ }
+ 
+ :root[fxadisabled="true"] #appMenu-fxa-status2,
+-:root[fxadisabled="true"] #appMenu-fxa-separator {
++:root[fxadisabled="true"] #appMenu-fxa-separator,
++:root[fxadisabled="true"] #fxa-toolbar-menu-button {
+   display: none;
+ }
+ 

@@ -795,11 +795,174 @@ Milestone 1 before-launch blocker list in ROADMAP.md.
 
 ---
 
+### D19. Milestone 1 Mozilla-UI surfaces: close four items by pref, open four decisions
+
+**Status.** Visual verification of the 2026-10-04 build (after D18 removed
+the account icon) surfaced nine more Mozilla-branded Settings panels,
+features, and illustrations. The earlier audits covered services that
+phoned home; this one covers VISIBLE and SEMI-VISIBLE branded surfaces.
+Four items are closed by pref here. Five items need user decisions and
+are added to the still-open table.
+
+**Closed by pref (no decision needed):**
+
+- **"More from Mozilla" / "More from Antumbra Project" product shelf pane
+  removed.** `browser.preferences.moreFromMozilla = false` hides the
+  entire pane. Lives in
+  `browser/components/preferences/moreFromMozilla.inc.xhtml` and advertises
+  Monitor, Thunderbird, MDN, Solo, and the Firefox mobile app QR. Pref is
+  the control; no patch needed.
+- **"Firefox Labs" (experimental features) pane removed.**
+  `browser.preferences.experimental.hidden = true` hides the pane. Lives
+  in `browser/components/preferences/preferences.xhtml:183-188`. Pref is
+  the control; no patch needed. Milestone 1 should not expose upstream
+  experimental features at all.
+- **AI chatbot entry points removed.** `browser.ml.chat.enabled = false`
+  hides the sidebar chatbot panel entry, the "Ask AI Chatbot" tab context
+  menu, the "Ask AI" selection context menu, and the "Summarize" button
+  in Reader Mode. `browser.ml.chat.provider = ""` is already the upstream
+  default; an unset provider is a secondary gate (see
+  `browser/components/genai/chat.js`). `browser.ml.enable = false` and
+  `browser.smartwindow.enabled = false` reaffirm already-false upstream
+  defaults so a future upstream flip does not silently enable them. This
+  is a disable, not a decision; the user has made no decision about AI
+  features and the still-open table carries the "what should Antumbra do
+  about AI" question.
+- **Backup feature removed from Settings.** `browser.backup.enabled = false`
+  and `browser.backup.scheduled.enabled = false` remove the Backup
+  Settings panel. Backup writes encrypted archives of profile data to
+  local disk only; there is no cloud component in the baseline
+  implementation. Removed for Milestone 1 because the UI surface is an
+  Antumbra decision we have not made, not because the feature contacts a
+  server. Revisit alongside the Antumbra Sync plan in MONETIZATION.md.
+
+**Open decisions added to the still-open table (Q8-Q12):**
+
+- **Q8. Firefox View.** User asked for the decision. Options:
+  (a) Remove the toolbar button and the Tools menu entry via chrome patch
+  (small patch to `navigator-toolbox.inc.xhtml:39-42` and the menu). The
+  page itself (`about:firefoxview`) can still be reached by typing the
+  URL. (b) Rename to "Antumbra View" via a localization override and
+  replace the fox illustration with an Antumbra wordmark. Not a small
+  patch because the strings live in multiple .ftl files and the brand
+  variable `-firefoxview-brand-name` is defined in
+  `toolkit/locales/en-US/toolkit/branding/brandings.ftl:52-53`. The sync
+  tab in Firefox View is dead UI with FxA disabled per D18.
+- **Q9. AI scope.** User said "I have made no decision about AI features
+  in this browser." Options: (a) ship with AI disabled for Milestone 1,
+  revisit later (current state after this entry). (b) Permanently remove
+  the AI panels and features from the Settings UI (chrome patches to
+  `preferences.xhtml:173-177`, removal of `aiFeatures.mjs` from the
+  Settings redesign, context-menu patches). (c) Keep features available
+  but default to blocked and let the user opt in explicitly. On-device
+  translation is a different question from remote-service chatbots and
+  can be decided separately.
+- **Q10. Backup.** Options: (a) leave disabled (current state after this
+  entry). (b) Enable, since data stays local and encrypted archives are
+  a legitimate feature. (c) Replace with an Antumbra-controlled profile
+  export/import that bypasses the Mozilla UI. Not a privacy question;
+  the feature is local-disk only, so the question is UI real estate and
+  support cost.
+- **Q11. "Managed by your organization" banner.** The banner appears on
+  every Settings page because `policies.json` is in use. Options:
+  (a) Suppress the banner via a one-function chrome patch to
+  `browser/components/preferences/preferences.js:1071-1077` making
+  `maybeDisplayPoliciesNotice` a no-op. Keeps all current policies in
+  effect; cost is a one-line patch that may need rebase if upstream
+  refactors `maybeDisplayPoliciesNotice`. (b) Replace `policies.json`
+  with an autoconfig file (`defaults/pref/channel-prefs.js` plus
+  `mozilla.cfg` + `defaults/pref/local-settings.js`), which locks the
+  same prefs without triggering the banner. More involved: each policy
+  needs a `lockPref("name", value)` equivalent, and policies that cannot
+  be expressed as prefs (e.g., `DisableFeedbackCommands`, which gates UI
+  not state) have no autoconfig equivalent and need their own chrome
+  patches. (c) Accept the banner as an "Antumbra locks these for your
+  privacy" statement. The banner text itself is a localized string that
+  can be rewritten via FTL override.
+- **Q12. Default browser card illustration and error page fox.**
+  Chrome-patch work. Not strictly Milestone 1 blockers unless the
+  maintainer considers them non-ship-able. The default browser card is
+  in `browser/components/preferences/main.inc.xhtml` and uses an
+  illustration asset from branding. The error page fox is in
+  `toolkit/content/errors/net-error-illustrations.mjs` and uses
+  `chrome://global/skin/illustrations/no-connection.svg`. For Milestone 1
+  the choices are: (a) replace with Antumbra-themed illustrations
+  (design + chrome patch), (b) remove illustrations entirely (small
+  chrome patch), (c) defer to Milestone 4 as part of the interface
+  polish batch.
+
+**Full sweep findings beyond what the user spotted:**
+
+The following items were enumerated during the sweep but have not been
+remediated here. They are listed in the still-open table where a
+decision is needed, or carried forward to Milestone 4 interface polish
+where the patch cost is non-trivial.
+
+- **Hamburger menu > Help > Report Broken Site** opens the webcompat.com
+  report flow (Mozilla's compatibility tracker). Pref + chrome patch.
+  Milestone 1 or later decision. (`browser/base/content/browser-menubar.inc.xhtml`,
+  `webcompat-reporter.ftl`).
+- **Help menu > What's New** opens Mozilla's release notes.
+  `app.releaseNotesURL` pref rewrite is sufficient.
+- **about:logins "Firefox Monitor" breach banners.** Pref:
+  `signon.management.page.breachAlertUrl`. Rewrite to our own URL or
+  disable the panel.
+- **about:protections dashboard** carries Lockwise, Monitor, and VPN
+  cards. Monitor and VPN already disabled by pref (D18); the dashboard
+  itself remains and references our rewritten URLs. Keep or patch to
+  remove entirely.
+- **about:support (Troubleshooting Information)** page shows Firefox
+  branding and build identity throughout. Chrome patch required to
+  rebrand strings.
+- **about:robots, about:rights, about:license** are legally required
+  (MPL copyright and license text). Not candidates for removal; the
+  rights page text can be customized via FTL override. about:robots is
+  a Firefox-specific Easter egg; remove via chrome patch if the
+  easter-egg branding is unacceptable.
+- **New tab brand strings** reference `-firefox-home-brand-name` =
+  "Firefox Home". Lives in
+  `toolkit/locales/en-US/toolkit/branding/brandings.ftl:49`. FTL
+  localization override required to change to "Antumbra Home" or similar.
+- **FTL brand variables.** The ESR 153 build uses several brand variables
+  across the UI: `-brand-short-name`, `-brand-shorter-name`,
+  `-brand-full-name` (Antumbra sets these already),
+  `-firefox-home-brand-name`, `-firefoxview-brand-name`,
+  `-firefoxlabs-brand-name`, `-firefox-brand-name`,
+  `-firefox-account(s)-brand-name(s)`. The three Antumbra brand variables
+  are overridden by `browser/branding/antumbra/locales/en-US/brand.ftl`.
+  The other `-firefox-*` brand variables are defined in
+  `toolkit/locales/en-US/toolkit/branding/brandings.ftl` and are NOT
+  currently overridden. They surface as "Firefox View", "Firefox Home",
+  "Firefox Labs", and "Firefox Account" in menus and panels. Overriding
+  them requires either a toolkit-locale patch or an FTL override shipped
+  with the Antumbra branding directory.
+- **Default bookmarks** at new-profile creation include Mozilla links.
+  Lives in `browser/locales/en-US/profile/bookmarks.inc`. Patch or
+  branding override.
+- **DevTools "Firefox DevTools" strings** appear in the devtools UI if
+  the user opens them. Chrome patch required to rebrand; defer to
+  Milestone 4 or later unless Milestone 1 maintainer-use is affected.
+- **PDF viewer** ships Mozilla's PDF.js with "pdf.js" branding visible
+  in a few corners. Not candidates for removal without forking PDF.js.
+- **Translations attribution.** On-device translation UI shows
+  "Translations by Firefox" or similar. FTL string; override.
+
+**Affects:** `prefs/antumbra.js` (seven new prefs across four features),
+`ROADMAP.md` Milestone 1 before-launch list, `DECISIONS.md` still-open
+table (five new questions Q8-Q12).
+
+---
+
 ## Still open
 
-Carried forward from ARCHITECTURE.md section 13 and D17.
+Carried forward from ARCHITECTURE.md section 13, D17, and D19.
 
 | # | Question | Needed by |
 |---|---|---|
 | 1 | **Split view.** Highest permanent maintenance cost in the spec. Confirm it is worth an annual re-patch against actively refactored front end code. | Milestone 4 |
 | 4 | **Funding.** Maintainer handles domain purchase and SignPath application directly. Remains an item in the Milestone 1 before-launch table but is not a code decision. | Milestone 0 (in flight with maintainer) |
+| 8 | **Firefox View (D19).** Rename and rebrand, or remove the toolbar button and Tools menu entry? If kept, the sync tab is dead UI with FxA off. | Milestone 1 |
+| 9 | **AI scope (D19).** Disabled for now. Permanently remove the Settings panel and context-menu entries, or keep behind the disable? Separate decision for on-device translation. | Milestone 1 |
+| 10 | **Backup (D19).** Disabled for now. Enable (data stays local), remove permanently, or replace with an Antumbra-controlled profile export? | Milestone 1 or Milestone 4 |
+| 11 | **"Managed by your organization" banner (D19).** Suppress via chrome patch, replace policies with autoconfig to avoid the banner, or accept the banner. | Milestone 1 |
+| 12 | **Default browser card illustration and error page fox illustration (D19).** Replace with Antumbra assets, remove, or defer to Milestone 4 interface polish. | Milestone 1 or Milestone 4 |

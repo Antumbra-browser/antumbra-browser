@@ -122,5 +122,39 @@ pref("browser.contentblocking.report.tracker.url", "https://antumbrabrowser.org/
 pref("browser.contentblocking.report.fingerprinter.url", "https://antumbrabrowser.org/help/trackers/fingerprint");
 pref("browser.contentblocking.report.cryptominer.url", "https://antumbrabrowser.org/help/trackers/cryptomining");
 
+/* --- Hide the "More from Mozilla" (renamed "More from Antumbra Project")
+ * product-shelf pane in Settings. The pane advertises Mozilla Monitor,
+ * Thunderbird, MDN, Solo, and the Firefox mobile app QR. See D19.
+ */
+pref("browser.preferences.moreFromMozilla", false);
+
+/* --- Hide the Firefox Labs (experimental features) pane in Settings. See D19. */
+pref("browser.preferences.experimental.hidden", true);
+
+/* --- AI features: disabled by default pending a decision on scope (D19).
+ * - browser.ml.chat.enabled gates the sidebar chatbot entry point and the
+ *   "Ask AI Chatbot" context-menu items.
+ * - browser.ml.chat.provider stays empty; even with the entry point enabled,
+ *   an unset provider hides the chat UI (see chat.css @media rule and
+ *   genai/chat.js logic).
+ * - browser.ml.enable is the global on-device ML switch and is already false
+ *   upstream; we reaffirm it here so a future upstream default flip does not
+ *   silently enable it.
+ * - browser.smartwindow.enabled controls the Smart Window feature and is
+ *   already false upstream; reaffirmed here for the same reason.
+ */
+pref("browser.ml.chat.enabled", false);
+pref("browser.ml.chat.provider", "");
+pref("browser.ml.enable", false);
+pref("browser.smartwindow.enabled", false);
+
+/* --- Backup feature disabled (D19). Firefox Backup is a local-disk
+ * encrypted-archive feature with no cloud component in its baseline
+ * implementation, but the Settings panel adds a surface we do not want for
+ * Milestone 1. Revisit when Antumbra has its own backup story.
+ */
+pref("browser.backup.enabled", false);
+pref("browser.backup.scheduled.enabled", false);
+
 /* --- Antumbra protection mode (new pref; antumbra.* allowlisted in audit-prefs.py) --- */
 pref("antumbra.protection.mode", "standard");

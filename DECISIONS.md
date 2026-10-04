@@ -596,6 +596,110 @@ Milestone 1 ships only after both guards are green and the drift-detector run on
 
 ---
 
+### D17. Milestone 1 verification findings: Mozilla-service entry points, promo card, add-on pane, native containers, error page
+
+**Status.** Visual verification of the 2026-10-03 cold build surfaced five
+items that go beyond brand-string removal. Four are decided or in-progress
+here. One (Mozilla-service entry points) is **open** and listed below in
+the still-open table.
+
+**Fixed in this entry, pref-only, no decision needed:**
+
+- `sidebar.verticalTabs.dragToPinPromo.dismissed = true`. The vertical-tabs
+  sidebar renders a "Drag important tabs here to keep them within reach"
+  card with Firefox, Slack, foxy, and Gmail icons until this pref is set.
+  The card lives in `browser/components/sidebar/sidebar-pins-promo.mjs`
+  and is pre-dismissable via the pref it already uses to track user
+  dismissal. Pre-dismissing is cleaner than hiding the card via CSS,
+  because the control already exists upstream and we are using it as
+  intended. Added to `prefs/antumbra.js`.
+- `extensions.getAddons.showPane = false` and
+  `extensions.htmlaboutaddons.recommendations.enabled = false`. The first
+  hides the "Recommendations" tab in about:addons. The second hides the
+  Recommended Extensions cards in the list view. Together they remove
+  every AMO-driven card from about:addons. The user-initiated "search for
+  more add-ons" input in the sidebar is unaffected and continues to work;
+  this is a separate question (see below) about whether Antumbra should
+  keep AMO as the add-on source at all.
+
+**Open sub-decisions deferred to the user, not resolved here:**
+
+- Whether Antumbra should keep AMO as the add-on source. Keeping AMO is
+  cheap (works out of the box, security review handled by Mozilla,
+  no infrastructure needed) and consistent with the current signed-only
+  posture (D3). Replacing it with a self-hosted mirror or allowlist means
+  running the mirror and running the signing. Not a Milestone 1 decision
+  unless the maintainer wants it to be.
+- Multi-Account Containers: revisit cost estimates for the native UI
+  replacement under revised constraints below.
+
+**Container UI replacement: revised cost estimate.**
+
+The 2026-09-18 plan assumed the native container UI was a Milestone 4
+item and that bundling MAC unmodified for Milestone 1 was the cheap
+path. The 2026-10-03 verification confirmed MAC does display
+"Firefox Multi-Account Containers" in the toolbar tooltip and about:addons,
+which is the branding inconsistency the Option-C note already captured.
+
+What was missed: **forking MAC is more expensive than it looks because
+of D3.** A fork requires either (a) submitting to AMO as a separately
+named extension, which has unpredictable review cycles and risks a
+near-duplicate rejection, or (b) signing it ourselves and relaxing
+`xpinstall.signatures.required`, which D3 explicitly rules out. The
+GPLv3 constraint from ARCHITECTURE.md 11.3 does not block a fork of
+MPL 2.0 MAC, but it does block modifications to uBlock Origin, so the
+pattern of "modify and reship" would set a precedent we would then
+have to argue against for every other bundled extension.
+
+Native container UI at **minimum viable** scope is a smaller job than
+either plan assumed. The pieces needed:
+
+1. Toolbar button that opens a picker panel. Chrome patch to
+   `browser/base/content/navigator-toolbox.inc.xhtml` and new
+   `antumbra-containers-panel.{xhtml,js,css}` under
+   `browser/components/antumbra/`. Roughly a week.
+2. Container picker and new-container dialog, both backed by the
+   existing `contextualIdentity` WebExtension API that Gecko already
+   exposes. No Gecko changes. Roughly a week including the two dialogs
+   and the per-container color/icon list.
+3. The "Open in container" context menu entry already exists upstream
+   behind `privacy.userContext.enabled`. One pref flip in
+   `antumbra.js` and nothing else.
+4. Tab coloring to reflect the container colour. Small CSS patch to
+   `browser/themes/shared/tabbrowser/tabs.css`, driven by the existing
+   `useContextColors` attribute. A day.
+
+Call it two to three weeks of chrome-patch work to replace MAC for the
+primary use case of "two accounts on one site at once". MAC's
+auto-containment rules (open domain X in container Y automatically) are
+not in minimum-viable scope and can land later or stay out of scope.
+
+Forking MAC is roughly one to two weeks of initial work plus 4 hours of
+maintenance per MAC release times about 6 releases per year, i.e. 24
+hours per year of ongoing cost, plus the signing problem above.
+
+**Recommendation (not a decision until the user confirms).** Native
+minimum-viable container UI, scheduled into Milestone 4 as currently
+planned, is the cleaner path. For Milestone 1, ship MAC unmodified and
+note the branding inconsistency in release notes, as the original
+Option-C plan said.
+
+**Error page illustration (Firefox fox).** Not currently tracked in
+ROADMAP.md or ARCHITECTURE.md. It belongs in Milestone 4 under
+"interface polish against BRANDING.md section 7" alongside the other
+chrome-patch visual items. The error page itself lives in
+`toolkit/content/aboutNetError.mjs` and `toolkit/content/net-error-card.mjs`,
+not under `browser/`, which means the patch touches toolkit code and
+should be scheduled with other toolkit-visual-polish items (not a huge
+patch but it will rebase annually along with upstream's periodic
+redesigns of the error page). Adding to Milestone 4 scope in this entry.
+
+**Affects:** `prefs/antumbra.js`, `ROADMAP.md` Milestone 1 release
+notes and Milestone 4 interface section, Milestone 4 scope list in
+ARCHITECTURE.md 6.8.
+
+---
+
 ## Still open
 
 Carried forward from ARCHITECTURE.md section 13. Not yet decided.
@@ -604,4 +708,7 @@ Carried forward from ARCHITECTURE.md section 13. Not yet decided.
 |---|---|---|
 | 1 | **Split view.** Highest permanent maintenance cost in the spec. Confirm it is worth an annual re-patch against actively refactored front end code. | Milestone 4 |
 | 3 | **Default DNS resolver.** An editorial choice with real privacy consequences. The reasoning must be published, not made quietly. | Milestone 1 |
+| 5 | **Mozilla-service entry points in the UI (D17).** The account icon, about:addons AMO pane, Monitor, Relay, and in-content SUMO links still reach mozilla.com. Options: (a) disable Firefox Accounts/Sync entirely for Milestone 1, (b) keep Sync against a self-hosted sync server, (c) ship as-is and accept the reviewer narrative. See D17 for each service's control surface. | Milestone 1 |
+| 6 | **Add-on source: AMO vs self-hosted mirror or allowlist.** Antumbra currently uses AMO for discovery and updates. Keeping it is cheap and consistent with D3 signing. Replacing it is real infrastructure work. See D17. | Milestone 4 or later |
+| 7 | **Multi-Account Containers path.** Milestone 1 ships MAC unmodified (branding inconsistency documented in release notes). Milestone 4 replaces with native minimum-viable container UI per D17. Confirm this ordering. | Milestone 4 |
 | 4 | **Funding.** Signing, a domain, and a trademark clearance opinion are real year-one costs before anyone is paid for their time. | Milestone 0 |

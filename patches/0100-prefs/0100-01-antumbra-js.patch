@@ -1,9 +1,9 @@
 diff --git a/browser/app/profile/antumbra.js b/browser/app/profile/antumbra.js
 new file mode 100644
-index 000000000000..57cb56e0472e
+index 000000000000..85cfee47ec4d
 --- /dev/null
 +++ b/browser/app/profile/antumbra.js
-@@ -0,0 +1,85 @@
+@@ -0,0 +1,94 @@
 +/* This Source Code Form is subject to the terms of the Mozilla Public
 + * License, v. 2.0. If a copy of the MPL was not distributed with this
 + * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -40,7 +40,6 @@ index 000000000000..57cb56e0472e
 +pref("toolkit.telemetry.server", "");
 +pref("datareporting.healthreport.uploadEnabled", false);
 +pref("datareporting.policy.dataSubmissionEnabled", false);
-+pref("browser.ping-centre.telemetry", false);
 +
 +/* --- Normandy / studies / experiments (D5) --- */
 +pref("app.normandy.enabled", false);
@@ -67,9 +66,6 @@ index 000000000000..57cb56e0472e
 +pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 +pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
 +
-+/* --- Pocket off --- */
-+pref("extensions.pocket.enabled", false);
-+
 +/* --- Content recommendations (discovery stream) off --- */
 +pref("browser.newtabpage.activity-stream.discoverystream.enabled", false);
 +
@@ -86,6 +82,19 @@ index 000000000000..57cb56e0472e
 +/* --- Vertical tabs (confirmed present in ESR 153) --- */
 +pref("sidebar.verticalTabs", true);
 +pref("sidebar.revamp", true);
++
++/* --- Pre-dismiss the vertical-tabs drag-to-pin promo card.
++ * sidebar-pins-promo.mjs renders a card with Firefox, Slack, foxy, Gmail
++ * icons until this pref is true. See D17 for details.
++ */
++pref("sidebar.verticalTabs.dragToPinPromo.dismissed", true);
++
++/* --- about:addons: hide the Recommendations tab and the Recommended cards.
++ * about:addons otherwise shows an AMO-driven Discovery pane with unrelated
++ * third-party suggestions. See D17.
++ */
++pref("extensions.getAddons.showPane", false);
++pref("extensions.htmlaboutaddons.recommendations.enabled", false);
 +
 +/* --- Antumbra protection mode (new pref; antumbra.* allowlisted in audit-prefs.py) --- */
 +pref("antumbra.protection.mode", "standard");

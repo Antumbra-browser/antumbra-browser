@@ -77,5 +77,18 @@ pref("browser.aboutwelcome.enabled", false);
 pref("sidebar.verticalTabs", true);
 pref("sidebar.revamp", true);
 
+/* --- Pre-dismiss the vertical-tabs drag-to-pin promo card.
+ * sidebar-pins-promo.mjs renders a card with Firefox, Slack, foxy, Gmail
+ * icons until this pref is true. See D17 for details.
+ */
+pref("sidebar.verticalTabs.dragToPinPromo.dismissed", true);
+
+/* --- about:addons: hide the Recommendations tab and the Recommended cards.
+ * about:addons otherwise shows an AMO-driven Discovery pane with unrelated
+ * third-party suggestions. See D17.
+ */
+pref("extensions.getAddons.showPane", false);
+pref("extensions.htmlaboutaddons.recommendations.enabled", false);
+
 /* --- Antumbra protection mode (new pref; antumbra.* allowlisted in audit-prefs.py) --- */
 pref("antumbra.protection.mode", "standard");

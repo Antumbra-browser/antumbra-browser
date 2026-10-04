@@ -374,16 +374,25 @@ Record the result in the build times table below, replacing the expected values.
 
 | Build type | Expected | Measured | Job count | When you use it |
 |---|---|---|---|---|
-| **Clean full build** | 60 to 90 min | 46m54s (2026-09-23) | 16 (default) | First build, after a rebase, after a mozconfig change |
+| **Clean full build** | 60 to 90 min | 70 min (2026-10-03) | 16 (default) | First build, after a rebase, after a mozconfig change |
 | **Full build**, warm sccache | varies | 47s (2026-09-24) | 16 (default) | Second build after branding assets added; no C++ changes, sccache hot |
 | **Incremental**, C++ change | 2 to 15 min | _not yet measured_ | 16 | Editing Gecko. A widely included header touches everything and approaches a full rebuild. |
 | **`./mach build faster`** | Seconds to ~2 min | 8s (2026-09-23) | n/a | **Frontend only**: JS, CSS, XHTML, prefs, branding assets. Most of Antumbra's milestone 1 work. |
 | **Artifact build** | 1 to 5 min | _not yet measured_ | n/a | Frontend iteration only. See the warning below. |
 
-**Note on the full build measurement.** The 46m54s figure was taken with partial
-sccache cache from prior failed build attempts. A true cold build from a clean
-object directory is expected to run 60 to 90 minutes. The number serves as a
-confirmed upper bound, not a cold-build baseline.
+**Note on the full build measurement.** The 70 min figure is a true cold build
+from a wiped object directory on 2026-10-03, after the 0000 and 0100 patch
+series were corrected (sorted FINAL_TARGET_FILES, locales/jar.mn,
+installer assets, branding.nsi defines, browser/distribution/moz.build).
+The earlier 46m54s run on 2026-09-23 was with a partial sccache from prior
+failed attempts and is not a cold-build baseline.
+
+**Note on jar-packaging retries.** The 2026-10-03 cold build hit Windows
+PermissionError (WinError 32, "file in use by another process") twice during
+the misc/jar-packaging phase, on devtools and localization .ftl files.
+Surfshark Antivirus holds file handles open while jar.py tries to swap the
+output. Retrying `./mach build` succeeds each time. Milestone 2 Defender
+exclusions in the Surfshark app will remove this jitter.
 
 Eight physical cores puts this machine at the slower end of the earlier 8-core
 estimate of 60 to 120 minutes, but NVMe and 64 GB of RAM pull it back toward the
@@ -514,8 +523,13 @@ because onboarding is the differentiator.
 ### In scope
 
 **Identity**
-- [ ] Full Antumbra branding: name, icon set, about dialog, window title. All Mozilla
-  trademarks removed. Build confirmed 2026-09-24; visual verification pending.
+- [x] Full Antumbra branding: name, icon set, about dialog, window title. All
+  Mozilla trademarks removed in brand strings. **Visually verified on
+  2026-10-03**: about dialog shows "Antumbra Browser" wordmark above
+  "Extended Support Release", version 153.3.0esr, "Antumbra Project", no
+  overlap, no Mozilla trademark text. See D17 for the Mozilla-service entry
+  points still reachable from the UI (account icon, about:addons AMO pane)
+  that go beyond brand-string removal.
 - [x] Custom branding directory. Not `--enable-official-branding`.
 
 **Privacy baseline, prefs and build flags only** (ARCHITECTURE.md section 5)
@@ -571,12 +585,24 @@ because onboarding is the differentiator.
   wherever Firefox would otherwise show an update link. They are unreachable until
   the domain is registered and the releases page is live. Start this early --
   domain registration is fast but building the releases page is not.
-- [ ] **Note Multi-Account Containers branding in release notes.** MAC ships
-  unmodified for Milestone 1 (Option C: replace with native container UI in a later
-  milestone). The extension's own UI displays "Firefox Multi-Account Containers."
-  Add one line to the Milestone 1 release notes stating that Multi-Account Containers
-  is a Mozilla product bundled unmodified, and that native container UI is planned
-  for a future release.
+- [ ] **Replace the nightly-sourced installer placeholders in `branding/antumbra/`
+  with Antumbra-branded assets.** During the 2026-10-03 cold build the
+  installer phase required `stubinstaller/bgstub.jpg`,
+  `stubinstaller/installing_page.css`, `stubinstaller/profile_cleanup_page.css`,
+  `wizHeader.bmp`, `wizHeaderRTL.bmp`, `wizWatermark.bmp`, which were missing.
+  They were filled in from `browser/branding/nightly/` so the build would
+  complete; those files still contain nightly dimensions and colors. The CSS
+  files reference nightly image paths. Replace before any installer goes to
+  users.
+- [ ] **Decide on Mozilla-service UI entry points (D17).** The account icon,
+  about:addons recommendations pane, and in-content SUMO links still reach
+  mozilla.com services. See D17 options a/b/c; this is the "most non-cosmetic"
+  item blocking the Milestone 1 claim of independence.
+- [ ] **Decide on Multi-Account Containers path (D17).** Previous plan was
+  Option C (ship unmodified for Milestone 1, replace with native UI in
+  Milestone 4). D17 revisits this with revised cost estimates for a native
+  minimum-viable container UI versus a fork, because the fork path collides
+  with D3's extension-signing stance.
 
 ### Explicitly out of scope for milestone 1
 
